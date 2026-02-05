@@ -140,20 +140,31 @@ export default function CalculatorPage() {
     };
   }, [batteryPower, batteryCapacity, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, selfConsumptionWithBattery, investment, includeEstimates]);
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     
     doc.setFillColor(34, 36, 33);
     doc.rect(0, 0, pageWidth, 45, "F");
     
-    doc.setTextColor(212, 255, 0);
-    doc.setFontSize(24);
-    doc.setFont("helvetica", "bold");
-    doc.text("ACRON", 20, 25);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("Energy System", 55, 25);
+    try {
+      const response = await fetch(acronLogo);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      const logoBase64 = await new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+      doc.addImage(logoBase64, "PNG", 20, 15, 50, 12);
+    } catch {
+      doc.setTextColor(212, 255, 0);
+      doc.setFontSize(24);
+      doc.setFont("helvetica", "bold");
+      doc.text("ACRON", 20, 25);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text("Energy System", 55, 25);
+    }
     
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
