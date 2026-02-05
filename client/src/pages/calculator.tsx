@@ -352,12 +352,16 @@ export default function CalculatorPage() {
       doc.text(line, 25, yPos + 16 + (i * 5));
     });
     
-    doc.setFontSize(8);
-    doc.setTextColor(128, 128, 128);
-    doc.text("Acron Energy System - Lønnsomhetskalkulator", 20, doc.internal.pageSize.getHeight() - 10);
-    doc.text(`Side 1 av ${doc.getNumberOfPages()}`, pageWidth - 40, doc.internal.pageSize.getHeight() - 10);
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(128, 128, 128);
+      doc.text("Acron Energy System - Lønnsomhetskalkulator", 20, doc.internal.pageSize.getHeight() - 10);
+      doc.text(`Side ${i} av ${totalPages}`, pageWidth - 40, doc.internal.pageSize.getHeight() - 10);
+    }
     
-    doc.save(`acron-lonnsomhetsanalyse-${batteryPower}kW-${new Date().toISOString().split("T")[0]}.pdf`);
+    doc.save(`acron-lønnsomhetsanalyse-${batteryPower}kW-${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
   return (
