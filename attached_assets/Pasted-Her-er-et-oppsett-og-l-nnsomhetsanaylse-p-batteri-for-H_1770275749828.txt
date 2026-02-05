@@ -1,0 +1,114 @@
+Her er et oppsett og lønnsomhetsanaylse på batteri for Holskogveien 76. (nybygget)
+Tall er basert på vårt eget anlegg og erfaringer. 
+Kun nå i februar har vi fått varsel om ca. 20 aktiveringer som utgjør en total brutto inntekt på 50.000,-
+
+Hører fra deg om dette kan være aktuelt. 
+
+
+Helhetlig energiløsning for Holskogveien 76
+Sol, batteri og fleksibilitet – med dokumentert historikk
+1. Teknisk løsning (byggeier eier anleggene)
+Solcelleanlegg
+•	Installert effekt: 355 kWp
+•	Forventet årsproduksjon: 317 500 kWh
+Batterisystem
+•	Konfigurasjon: 2 × 125 kW / 253 kWh SkanBatt
+•	Total effekt: 250 kW (100 % utnyttbar)
+•	Total energi: 506 kWh
+•	Utnyttbar energi (80 %): ~405 kWh
+Batteriet er dimensjonert for både fleksibilitet mot nettet og optimal energibruk i bygget.
+________________________________________
+2. Energigrunnlag i bygget
+•	Estimert årlig energiforbruk: 250 000 kWh
+•	Solproduksjon er sesongbasert (sommer)
+•	Forbruk er høyest vinter
+Egenforbruk av sol
+•	Uten batteri: 30 % (~95 000 kWh)
+•	Med batteri: 43 % (~136 000 kWh)
+________________________________________
+3. Dokumentert erfaring – Kristiansand Teknologipark
+Referanseprosjekt levert og driftet av Acron
+•	Lokasjon: Kristiansand Teknologipark
+•	Batteri: 0,23 MW
+•	Marked: LongFlex (lokalt fleksibilitetsmarked)
+•	Nettselskap: Glitre Nett
+Faktiske, fakturerte tall:
+•	Tilgjengelighetsinntekt: ~135 000 kr/år
+•	Aktiveringsinntekt (ca. 40 aktiveringer): ~69 000 kr/år
+•	Total fleksinntekt:
+~205 000 kr/år (eks. mva)
+Dette er reelle inntekter, basert på:
+•	faktisk tilgjengelig effekt
+•	faktisk aktivering
+•	faktisk avregning fra nettselskap
+Tallene brukes som konservativt erfaringsgrunnlag i dette prosjektet, skalert etter effekt og tilgjengelighet.
+________________________________________
+4. Hvordan verdiene realiseres i dette bygget
+A) Fleksibilitetsmarked (betalt av nettselskap)
+•	Batteriet stilles til rådighet for nettet
+•	Betaling skjer for:
+o	tilgjengelig effekt
+o	faktisk aktivering
+•	Inntekten er uavhengig av strømpris
+Årlig brutto fleksinntekt (estimert):
+≈ 231 000 kr
+________________________________________
+B) Økt utnyttelse av solenergi
+•	Soloverskudd lagres i batteriet
+•	Brukes i bygget eller selges til leietaker
+•	Byggeier bestemmer selv eventuell rabatt mot leietaker
+Årlig brutto verdi:
+≈ 46 000 kr
+________________________________________
+C) Reduserte effektkostnader (peak shaving)
+•	Batteriet reduserer maksimalt effektuttak
+•	Besparelsen måles direkte i nettleien
+•	Byggeier bestemmer selv hvordan gevinsten fordeles
+Årlig brutto besparelse:
+≈ 10 600 kr
+________________________________________
+D) Smart strømbruk (spot-arbitrage)
+•	Batteriet utnytter prisforskjeller, primært vinter
+•	Byggeier bestemmer selv eventuell rabatt mot leietaker
+Årlig brutto verdi:
+≈ 12 000 kr
+________________________________________
+5. Samlet årlig verdiskaping (brutto)
+Kilde	kr/år
+Fleksibilitetsmarked	231 000
+Økt solutnyttelse	46 000
+Peak shaving	10 600
+Spot-arbitrage	12 000
+Sum brutto verdi	≈ 300 000
+________________________________________
+6. Acron sin rolle og vederlag
+Acron leverer en helhetlig tjeneste, inkludert:
+•	systemleveranse og integrasjon
+•	styring og optimalisering av batteriet
+•	markedstilgang til fleksibilitetsmarkedet
+•	måling, rapportering og avregning
+•	løpende oppfølging og drift
+Vederlag til Acron:
+•	15 % av samlet inntekt/besparelse
+•	kun betalt når verdier faktisk realiseres
+________________________________________
+7. Netto verdi, investering og ROI
+•	Brutto verdiskaping: ~300 000 kr/år
+•	Acron (15 %): ~45 000 kr/år
+•	Netto til byggeier: ~255 000 kr/år
+Investering: 1,2 MNOK eks mva.
+(Pris er inkl. kraning, montasje og el.arbeider, men eksl. fundament etc.)
+
+Tilbakebetalingstid: ~4,7 år
+Årlig avkastning (ROI): ~21,3 %
+
+Acron kan tilby finansiering om ønskelig.
+________________________________________
+8. Konklusjon for byggeier
+•	Prosjektet bygger på dokumentert drift og faktiske inntekter
+•	Risiko reduseres gjennom:
+o	reell historikk og erfaringer
+o	konservative forutsetninger
+o	én ansvarlig leverandør
+•	Byggeier beholder full kontroll og eierskap
+•	Når batteriet er ferdig nedbetalt, vil den løpende netto kontantstrømmen fra anlegget inngå i byggets driftsresultat og dermed bidra til økt verdi på eiendommen.
