@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import acronLogo from "@/assets/acron-logo.png";
 
 const REFERENCE_DATA = {
   location: "Kristiansand Teknologipark",
@@ -340,9 +341,13 @@ export default function CalculatorPage() {
     <div className="min-h-screen bg-gradient-to-br from-acron-dark via-acron-dark to-[hsl(68_40%_25%)]" data-testid="page-calculator">
       <header className="border-b border-white/10 bg-acron-dark/80 backdrop-blur-sm sticky top-0 z-50" data-testid="header">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl font-bold text-acron-lime tracking-tight" data-testid="text-logo">ACRON</span>
-            <span className="text-sm text-white/70">Energy System™</span>
+          <div className="flex items-center">
+            <img 
+              src={acronLogo} 
+              alt="Acron Energy System" 
+              className="h-6 brightness-0 invert sepia saturate-[10000%] hue-rotate-[22deg]" 
+              data-testid="img-logo" 
+            />
           </div>
           <Badge variant="outline" className="border-acron-lime/50 text-acron-lime bg-acron-lime/10" data-testid="badge-calculator">
             Lønnsomhetskalkulator
