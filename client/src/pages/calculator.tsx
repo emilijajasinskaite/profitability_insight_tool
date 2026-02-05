@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import acronLogo from "@/assets/acron-logo.png";
 
 const REFERENCE_DATA = {
   location: "Kristiansand Teknologipark",
@@ -342,7 +341,7 @@ export default function CalculatorPage() {
       <header className="border-b border-white/10 bg-acron-dark/80 backdrop-blur-sm sticky top-0 z-50" data-testid="header">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src={acronLogo} alt="Acron" className="h-8 brightness-0 invert" data-testid="img-logo" />
+            <span className="text-2xl font-bold text-acron-lime tracking-tight" data-testid="text-logo">ACRON</span>
             <span className="text-sm text-white/70">Energy System™</span>
           </div>
           <Badge variant="outline" className="border-acron-lime/50 text-acron-lime bg-acron-lime/10" data-testid="badge-calculator">
@@ -620,7 +619,7 @@ export default function CalculatorPage() {
             </Card>
           </div>
 
-          <div className="space-y-6 sticky top-24 z-10">
+          <div className="space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto z-10">
             <Card className="border-0 shadow-xl bg-gradient-to-br from-acron-dark to-[hsl(68_30%_20%)] text-white" data-testid="card-results">
               <CardHeader className="pb-4">
                 <div className="flex items-center gap-2">
