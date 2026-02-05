@@ -81,6 +81,10 @@ export default {
           busy: "rgb(239 68 68)",
           offline: "rgb(156 163 175)",
         },
+        acron: {
+          lime: "hsl(var(--acron-lime) / <alpha-value>)",
+          dark: "hsl(var(--acron-dark) / <alpha-value>)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)"],
