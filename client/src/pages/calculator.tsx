@@ -164,7 +164,10 @@ export default function CalculatorPage() {
       ctx.drawImage(img, 0, 0);
       const invertedLogo = canvas.toDataURL("image/png");
       
-      doc.addImage(invertedLogo, "PNG", 20, 15, 50, 12);
+      const logoHeight = 10;
+      const aspectRatio = img.width / img.height;
+      const logoWidth = logoHeight * aspectRatio;
+      doc.addImage(invertedLogo, "PNG", 20, 17, logoWidth, logoHeight);
     } catch {
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
