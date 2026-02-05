@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import acronLogo from "@/assets/acron-logo.png";
 
 const REFERENCE_DATA = {
   location: "Kristiansand Teknologipark",
@@ -341,7 +342,7 @@ export default function CalculatorPage() {
       <header className="border-b border-white/10 bg-acron-dark/80 backdrop-blur-sm sticky top-0 z-50" data-testid="header">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="text-2xl font-bold text-acron-lime tracking-tight" data-testid="text-logo">ACRON</span>
+            <img src={acronLogo} alt="Acron" className="h-8 invert" data-testid="img-logo" />
             <span className="text-sm text-white/70">Energy System™</span>
           </div>
           <Badge variant="outline" className="border-acron-lime/50 text-acron-lime bg-acron-lime/10" data-testid="badge-calculator">
@@ -620,7 +621,7 @@ export default function CalculatorPage() {
           </div>
 
           <div className="space-y-6">
-            <Card className="border-0 shadow-xl bg-gradient-to-br from-acron-dark to-[hsl(68_30%_20%)] text-white sticky top-24" data-testid="card-results">
+            <Card className="border-0 shadow-xl bg-gradient-to-br from-acron-dark to-[hsl(68_30%_20%)] text-white sticky top-24 z-10" data-testid="card-results">
               <CardHeader className="pb-4">
                 <div className="flex items-center gap-2">
                   <Calculator className="h-5 w-5 text-acron-lime" />
@@ -717,7 +718,7 @@ export default function CalculatorPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-xl" data-testid="card-reference-data">
+            <Card className="border-0 shadow-xl relative z-20" data-testid="card-reference-data">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-green-500" />
