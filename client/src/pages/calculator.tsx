@@ -180,7 +180,7 @@ export default function CalculatorPage() {
     
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
-    doc.text("Lonnsomhetsanalyse - Batterisystem", 20, 38);
+    doc.text("Lønnsomhetsanalyse - Batterisystem", 20, 38);
     
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(10);
@@ -199,11 +199,11 @@ export default function CalculatorPage() {
         ["Utnyttbar kapasitet (80%)", `${formatNumber(batteryCapacity * 0.8)} kWh`],
         ...(includeSolar ? [
           ["Solcelleanlegg", `${formatNumber(solarCapacity)} kWp`],
-          ["Solproduksjon (brukerangitt)", `${formatNumber(solarProductionPerKwp)} kWh/kWp/ar`],
-          ["Forventet arsproduksjon", `${formatNumber(solarCapacity * solarProductionPerKwp)} kWh`],
+          ["Solproduksjon (brukerangitt)", `${formatNumber(solarProductionPerKwp)} kWh/kWp/år`],
+          ["Forventet årsproduksjon", `${formatNumber(solarCapacity * solarProductionPerKwp)} kWh`],
           ["Egenforbruk uten batteri (brukerangitt)", `${selfConsumptionWithoutBattery}%`],
           ["Egenforbruk med batteri (brukerangitt)", `${selfConsumptionWithBattery}%`],
-          ["Strompris (brukerangitt)", `${spotPrice.toFixed(2)} kr/kWh`],
+          ["Strømpris (brukerangitt)", `${spotPrice.toFixed(2)} kr/kWh`],
         ] : []),
         ["Investering", formatCurrency(investment)],
         ["Inkluderer estimater", includeEstimates ? "Ja" : "Nei"],
@@ -217,7 +217,7 @@ export default function CalculatorPage() {
     
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.text("Arlig verdiskaping", 20, yPos);
+    doc.text("Årlig verdiskaping", 20, yPos);
     
     const tableBody = [
       ["Fleksibilitetsmarked (VERIFISERT)", formatNumber(results.flexibilityIncome), formatPercent(results.flexibilityIncome / results.grossValue)],
@@ -234,7 +234,7 @@ export default function CalculatorPage() {
     
     autoTable(doc, {
       startY: yPos + 5,
-      head: [["Inntektskilde", "Belop (kr/ar)", "Andel"]],
+      head: [["Inntektskilde", "Beløp (kr/år)", "Andel"]],
       body: tableBody,
       foot: [["Sum brutto verdi", formatNumber(results.grossValue), "100%"]],
       theme: "striped",
@@ -247,17 +247,17 @@ export default function CalculatorPage() {
     
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.text("Nokkeltall", 20, yPos);
+    doc.text("Nøkkeltall", 20, yPos);
     
     autoTable(doc, {
       startY: yPos + 5,
       head: [["Beskrivelse", "Verdi"]],
       body: [
-        ["Brutto verdiskaping", formatCurrency(results.grossValue) + "/ar"],
-        ["Acron vederlag (15%)", formatCurrency(results.acronFee) + "/ar"],
-        ["Netto til byggeier", formatCurrency(results.netValue) + "/ar"],
-        ["Tilbakebetalingstid", `${results.paybackYears.toFixed(1)} ar`],
-        ["Arlig avkastning (ROI)", formatPercent(results.roi)],
+        ["Brutto verdiskaping", formatCurrency(results.grossValue) + "/år"],
+        ["Acron vederlag (15%)", formatCurrency(results.acronFee) + "/år"],
+        ["Netto til byggeier", formatCurrency(results.netValue) + "/år"],
+        ["Tilbakebetalingstid", `${results.paybackYears.toFixed(1)} år`],
+        ["Årlig avkastning (ROI)", formatPercent(results.roi)],
       ],
       theme: "striped",
       headStyles: { fillColor: [34, 36, 33], textColor: [212, 255, 0] },
@@ -283,10 +283,10 @@ export default function CalculatorPage() {
       `Referanseprosjekt: ${REFERENCE_DATA.location}`,
       `Kilde: ${REFERENCE_DATA.dataSource}`,
       `Referansebatteri: ${REFERENCE_DATA.batteryPower} kW`,
-      `Dokumentert fleksinntekt: ${formatCurrency(REFERENCE_DATA.actualTotalFlexIncome)}/ar`,
-      `  - Tilgjengelighetsinntekt: ${formatCurrency(REFERENCE_DATA.actualAvailabilityIncome)}/ar`,
-      `  - Aktiveringsinntekt (${REFERENCE_DATA.activationsPerYear} aktiveringer): ${formatCurrency(REFERENCE_DATA.actualActivationIncome)}/ar`,
-      `Beregnet fleksinntekt per kW: ${formatCurrency(REFERENCE_DATA.totalFlexIncomePerKw)}/kW/ar`,
+      `Dokumentert fleksinntekt: ${formatCurrency(REFERENCE_DATA.actualTotalFlexIncome)}/år`,
+      `  - Tilgjengelighetsinntekt: ${formatCurrency(REFERENCE_DATA.actualAvailabilityIncome)}/år`,
+      `  - Aktiveringsinntekt (${REFERENCE_DATA.activationsPerYear} aktiveringer): ${formatCurrency(REFERENCE_DATA.actualActivationIncome)}/år`,
+      `Beregnet fleksinntekt per kW: ${formatCurrency(REFERENCE_DATA.totalFlexIncomePerKw)}/kW/år`,
     ];
     
     verifiedData.forEach((line) => {
@@ -307,14 +307,14 @@ export default function CalculatorPage() {
       
       const estimateLines = [];
       if (includeSolar) {
-        estimateLines.push(`Strompris (brukerangitt): ${spotPrice.toFixed(2)} kr/kWh`);
-        estimateLines.push(`Solproduksjon (brukerangitt): ${solarProductionPerKwp} kWh/kWp/ar`);
+        estimateLines.push(`Strømpris (brukerangitt): ${spotPrice.toFixed(2)} kr/kWh`);
+        estimateLines.push(`Solproduksjon (brukerangitt): ${solarProductionPerKwp} kWh/kWp/år`);
         estimateLines.push(`Egenforbruk uten batteri (brukerangitt): ${selfConsumptionWithoutBattery}%`);
         estimateLines.push(`Egenforbruk med batteri (brukerangitt): ${selfConsumptionWithBattery}%`);
       }
       if (includeEstimates) {
-        estimateLines.push(`Peak shaving: ${ESTIMATES.peakShavingPerKw} kr/kW/ar (estimat basert pa typiske tariffer)`);
-        estimateLines.push(`Spot-arbitrage: ${ESTIMATES.spotArbitragePerKwh} kr/kWh/ar (estimat basert pa historiske prisforskjeller)`);
+        estimateLines.push(`Peak shaving: ${ESTIMATES.peakShavingPerKw} kr/kW/år (estimat basert på typiske tariffer)`);
+        estimateLines.push(`Spot-arbitrage: ${ESTIMATES.spotArbitragePerKwh} kr/kWh/år (estimat basert på historiske prisforskjeller)`);
       }
       estimateLines.push(`Acron vederlag: ${formatPercent(ACRON_FEE_PERCENTAGE)} av samlet inntekt/besparelse`);
       
@@ -354,7 +354,7 @@ export default function CalculatorPage() {
     
     doc.setFontSize(8);
     doc.setTextColor(128, 128, 128);
-    doc.text("Acron Energy System - Lonnsomhetskalkulator", 20, doc.internal.pageSize.getHeight() - 10);
+    doc.text("Acron Energy System - Lønnsomhetskalkulator", 20, doc.internal.pageSize.getHeight() - 10);
     doc.text(`Side 1 av ${doc.getNumberOfPages()}`, pageWidth - 40, doc.internal.pageSize.getHeight() - 10);
     
     doc.save(`acron-lonnsomhetsanalyse-${batteryPower}kW-${new Date().toISOString().split("T")[0]}.pdf`);
