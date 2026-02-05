@@ -148,16 +148,25 @@ export default function CalculatorPage() {
     doc.rect(0, 0, pageWidth, 45, "F");
     
     try {
-      const response = await fetch(acronLogo);
-      const blob = await response.blob();
-      const reader = new FileReader();
-      const logoBase64 = await new Promise<string>((resolve) => {
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(blob);
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = reject;
+        img.src = acronLogo;
       });
-      doc.addImage(logoBase64, "PNG", 20, 15, 50, 12);
+      
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d")!;
+      ctx.filter = "invert(1)";
+      ctx.drawImage(img, 0, 0);
+      const invertedLogo = canvas.toDataURL("image/png");
+      
+      doc.addImage(invertedLogo, "PNG", 20, 15, 50, 12);
     } catch {
-      doc.setTextColor(212, 255, 0);
+      doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
       doc.setFont("helvetica", "bold");
       doc.text("ACRON", 20, 25);
