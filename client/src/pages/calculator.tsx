@@ -18,7 +18,6 @@ import {
   Calculator,
   PiggyBank,
   Clock,
-  CheckCircle2,
   AlertTriangle,
   HelpCircle
 } from "lucide-react";
@@ -26,16 +25,12 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import acronLogo from "@/assets/acron-logo.png";
 
-const REFERENCE_DATA = {
-  location: "Kristiansand Teknologipark",
-  batteryPower: 230,
-  availabilityIncomePerKw: 587,
-  activationsPerYear: 40,
-  incomePerActivationPerKw: 7.5,
-  actualAvailabilityIncome: 135000,
-  actualActivationIncome: 69000,
-  actualTotalFlexIncome: 205000,
-  dataSource: "Faktiske, fakturerte tall fra Acron-driftet anlegg",
+const FLEX_DEFAULTS = {
+  activationPrice: 10000,
+  availabilityPriceWinter: 200,
+  hoursPerDay: 2,
+  activationsPerWinter: 7,
+  summerFactor: 50,
 };
 
 const SOLAR_REFERENCE = {
@@ -90,21 +85,47 @@ function formatPercent(num: number): string {
 export default function CalculatorPage() {
   const [batteryPower, setBatteryPower] = useState(250);
   const [batteryCapacity, setBatteryCapacity] = useState(506);
+  const [activationPrice, setActivationPrice] = useState(FLEX_DEFAULTS.activationPrice);
+  const [availabilityPriceWinter, setAvailabilityPriceWinter] = useState(FLEX_DEFAULTS.availabilityPriceWinter);
+  const [hoursPerDay, setHoursPerDay] = useState(FLEX_DEFAULTS.hoursPerDay);
+  const [activationsPerWinter, setActivationsPerWinter] = useState(FLEX_DEFAULTS.activationsPerWinter);
+  const [summerFactor, setSummerFactor] = useState(FLEX_DEFAULTS.summerFactor);
   const [includeSolar, setIncludeSolar] = useState(true);
   const [solarCapacity, setSolarCapacity] = useState(355);
   const [spotPrice, setSpotPrice] = useState(SOLAR_REFERENCE.spotPricePerKwh);
   const [solarProductionPerKwp, setSolarProductionPerKwp] = useState(SOLAR_REFERENCE.kwhPerKwp);
   const [selfConsumptionWithoutBattery, setSelfConsumptionWithoutBattery] = useState(SOLAR_REFERENCE.selfConsumptionWithoutBattery);
   const [selfConsumptionWithBattery, setSelfConsumptionWithBattery] = useState(SOLAR_REFERENCE.selfConsumptionWithBattery);
-  const [activations, setActivations] = useState(REFERENCE_DATA.activationsPerYear);
   const [investment, setInvestment] = useState(1200000);
   const [includeEstimates, setIncludeEstimates] = useState(true);
 
-  const activationIncomePerKw = activations * REFERENCE_DATA.incomePerActivationPerKw;
-  const totalFlexIncomePerKw = REFERENCE_DATA.availabilityIncomePerKw + activationIncomePerKw;
+  const batteryMW = batteryPower / 1000;
+
+  const flexBreakdown = useMemo(() => {
+    const pricePerHour = availabilityPriceWinter * batteryMW;
+    const pricePerDay = pricePerHour * hoursPerDay;
+    const pricePerWeek = pricePerDay * 5;
+    const pricePerMonth = pricePerWeek * 4;
+    const pricePerWinter = pricePerMonth * 6;
+    const pricePerSummer = pricePerWinter * (summerFactor / 100);
+    const availabilityPerYear = pricePerWinter + pricePerSummer;
+    const activationSumWinter = activationPrice * batteryMW * activationsPerWinter;
+    const totalFlexIncome = availabilityPerYear + activationSumWinter;
+    return {
+      pricePerHour,
+      pricePerDay,
+      pricePerWeek,
+      pricePerMonth,
+      pricePerWinter,
+      pricePerSummer,
+      availabilityPerYear,
+      activationSumWinter,
+      totalFlexIncome,
+    };
+  }, [batteryMW, activationPrice, availabilityPriceWinter, hoursPerDay, activationsPerWinter, summerFactor]);
 
   const results = useMemo<CalculationResult>(() => {
-    const flexibilityIncome = batteryPower * totalFlexIncomePerKw;
+    const flexibilityIncome = flexBreakdown.totalFlexIncome;
     
     let solarUtilizationValue = 0;
     if (includeSolar && solarCapacity > 0) {
@@ -141,7 +162,7 @@ export default function CalculatorPage() {
       paybackYears,
       roi,
     };
-  }, [batteryPower, batteryCapacity, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, selfConsumptionWithBattery, investment, includeEstimates, totalFlexIncomePerKw]);
+  }, [batteryPower, batteryCapacity, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, selfConsumptionWithBattery, investment, includeEstimates, flexBreakdown]);
 
   const generatePDF = async () => {
     const doc = new jsPDF();
@@ -197,11 +218,14 @@ export default function CalculatorPage() {
       startY: 70,
       head: [["Parameter", "Verdi"]],
       body: [
-        ["Batterieffekt", `${formatNumber(batteryPower)} kW`],
+        ["Batterieffekt", `${formatNumber(batteryPower)} kW (${batteryMW} MW)`],
         ["Batterikapasitet", `${formatNumber(batteryCapacity)} kWh`],
         ["Utnyttbar kapasitet (80%)", `${formatNumber(batteryCapacity * 0.8)} kWh`],
-        ["Antall aktiveringer", `${activations} per år`],
-        ["Fleksinntekt per kW", `${formatCurrency(totalFlexIncomePerKw)}/kW/år`],
+        ["Aktiveringspris", `${formatNumber(activationPrice)} kr/MW`],
+        ["Tilgjengelighetspris vinter", `${formatNumber(availabilityPriceWinter)} kr/MW/t`],
+        ["Timer/dag", `${hoursPerDay}`],
+        ["Aktiveringer pr vinter", `${activationsPerWinter}`],
+        ["Sommerinntekt", `${summerFactor}% av vinter`],
         ...(includeSolar ? [
           ["Solcelleanlegg", `${formatNumber(solarCapacity)} kWp`],
           ["Solproduksjon (brukerangitt)", `${formatNumber(solarProductionPerKwp)} kWh/kWp/år`],
@@ -225,7 +249,7 @@ export default function CalculatorPage() {
     doc.text("Årlig verdiskaping", 20, yPos);
     
     const tableBody = [
-      ["Fleksibilitetsmarked (VERIFISERT)", formatNumber(results.flexibilityIncome), formatPercent(results.flexibilityIncome / results.grossValue)],
+      ["Fleksibilitetsmarked", formatNumber(results.flexibilityIncome), formatPercent(results.flexibilityIncome / results.grossValue)],
     ];
     
     if (includeSolar) {
@@ -278,23 +302,51 @@ export default function CalculatorPage() {
     
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.text("Datagrunnlag - VERIFISERTE TALL", 20, yPos);
+    doc.text("Fleksibilitetsmarked - Detaljert fordeling", 20, yPos);
+    
+    autoTable(doc, {
+      startY: yPos + 5,
+      head: [["Komponent", "Beløp (kr)"]],
+      body: [
+        ["Tilgjengelighet vinter (6 mnd)", formatNumber(flexBreakdown.pricePerWinter)],
+        [`Tilgjengelighet sommer (${summerFactor}% av vinter)`, formatNumber(flexBreakdown.pricePerSummer)],
+        ["Sum tilgjengelighet pr år", formatNumber(flexBreakdown.availabilityPerYear)],
+        [`Aktiveringssum vinter (${activationsPerWinter} aktiveringer)`, formatNumber(flexBreakdown.activationSumWinter)],
+      ],
+      foot: [["Totalsum fleksibilitetsmarked", formatNumber(flexBreakdown.totalFlexIncome)]],
+      theme: "striped",
+      headStyles: { fillColor: [34, 36, 33], textColor: [212, 255, 0] },
+      footStyles: { fillColor: [212, 255, 0], textColor: [34, 36, 33], fontStyle: "bold" },
+      margin: { left: 20, right: 20 },
+    });
+    
+    yPos = (doc as any).lastAutoTable.finalY + 15;
+    
+    if (yPos > 230) {
+      doc.addPage();
+      yPos = 20;
+    }
+    
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Beregningsgrunnlag", 20, yPos);
+    yPos += 8;
     
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
-    yPos += 8;
     
-    const verifiedData = [
-      `Referanseprosjekt: ${REFERENCE_DATA.location}`,
-      `Kilde: ${REFERENCE_DATA.dataSource}`,
-      `Referansebatteri: ${REFERENCE_DATA.batteryPower} kW`,
-      `Dokumentert fleksinntekt: ${formatCurrency(REFERENCE_DATA.actualTotalFlexIncome)}/år`,
-      `  - Tilgjengelighetsinntekt: ${formatCurrency(REFERENCE_DATA.actualAvailabilityIncome)}/år`,
-      `  - Aktiveringsinntekt (${REFERENCE_DATA.activationsPerYear} aktiveringer): ${formatCurrency(REFERENCE_DATA.actualActivationIncome)}/år`,
-      `Beregnet fleksinntekt per kW: ${formatCurrency(totalFlexIncomePerKw)}/kW/år (${activations} aktiveringer)`,
+    const dataLines = [
+      `Tilgjengelighetspris vinter: ${formatNumber(availabilityPriceWinter)} kr/MW/t`,
+      `Pris pr time: ${formatNumber(flexBreakdown.pricePerHour)} kr (${formatNumber(availabilityPriceWinter)} kr/MW/t x ${batteryMW} MW)`,
+      `Pris pr dag: ${formatNumber(flexBreakdown.pricePerDay)} kr (${hoursPerDay} timer/dag)`,
+      `Pris pr uke: ${formatNumber(flexBreakdown.pricePerWeek)} kr (5 virkedager)`,
+      `Pris pr måned: ${formatNumber(flexBreakdown.pricePerMonth)} kr (4 uker)`,
+      `Pris pr vinter: ${formatNumber(flexBreakdown.pricePerWinter)} kr (6 måneder)`,
+      `Pris pr sommer: ${formatNumber(flexBreakdown.pricePerSummer)} kr (${summerFactor}% av vinterinntekt)`,
+      `Aktiveringspris: ${formatNumber(activationPrice)} kr/MW x ${batteryMW} MW x ${activationsPerWinter} aktiveringer = ${formatNumber(flexBreakdown.activationSumWinter)} kr`,
     ];
     
-    verifiedData.forEach((line) => {
+    dataLines.forEach((line) => {
       doc.text(line, 20, yPos);
       yPos += 5;
     });
@@ -302,6 +354,10 @@ export default function CalculatorPage() {
     yPos += 5;
     
     if (includeEstimates || includeSolar) {
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
       doc.setFontSize(14);
       doc.setFont("helvetica", "bold");
       doc.text("Brukerangitte verdier og estimater", 20, yPos);
@@ -347,7 +403,7 @@ export default function CalculatorPage() {
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     const limitations = [
-      "* Fleksinntekter er basert pa dokumenterte tall fra " + REFERENCE_DATA.location + " og skalert etter effekt.",
+      "* Fleksinntekter er beregnet fra angitte priser og batterieffekt.",
       "* Faktisk inntekt kan variere basert pa lokale nettforhold, markedssituasjon og batteritilgjengelighet.",
       "* Verdier merket ESTIMAT er ikke verifisert og kan variere betydelig.",
       "* Ta kontakt med Acron for noyaktig prosjektvurdering.",
@@ -393,7 +449,7 @@ export default function CalculatorPage() {
             Lønnsomhetskalkulator for batterisystem
           </h1>
           <p className="text-white/70 text-lg max-w-3xl" data-testid="text-subtitle">
-            Beregn potensiell avkastning basert på dokumenterte resultater fra {REFERENCE_DATA.location}.
+            Beregn potensiell avkastning fra fleksibilitetsmarkedet med valgfrie priser og parametere.
           </p>
         </div>
 
@@ -404,20 +460,16 @@ export default function CalculatorPage() {
                 <div className="flex items-center gap-2">
                   <Battery className="h-5 w-5 text-acron-lime" />
                   <CardTitle>Batterisystem</CardTitle>
-                  <Badge variant="secondary" className="ml-auto text-xs" data-testid="badge-verified">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    Verifiserte data
-                  </Badge>
                 </div>
                 <CardDescription>
-                  Fleksinntekt beregnes fra dokumenterte tall: {formatCurrency(totalFlexIncomePerKw)}/kW/år ({activations} aktiveringer)
+                  Konfigurer batterieffekt og priser for fleksibilitetsmarkedet
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="battery-power" className="text-base">Batterieffekt</Label>
-                    <span className="text-lg font-semibold text-acron-lime" data-testid="text-battery-power">{formatNumber(batteryPower)} kW</span>
+                    <span className="text-lg font-semibold text-acron-lime" data-testid="text-battery-power">{formatNumber(batteryPower)} kW ({batteryMW} MW)</span>
                   </div>
                   <Slider
                     id="battery-power"
@@ -455,44 +507,85 @@ export default function CalculatorPage() {
                     <span>2000 kWh</span>
                   </div>
                 </div>
-                
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="activation-price" className="text-sm">Aktiveringspris (kr/MW)</Label>
+                    <Input
+                      id="activation-price"
+                      data-testid="input-activation-price"
+                      type="number"
+                      value={activationPrice}
+                      onChange={(e) => setActivationPrice(Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="availability-price-winter" className="text-sm">Tilgjengelighetspris vinter (kr/MW/t)</Label>
+                    <Input
+                      id="availability-price-winter"
+                      data-testid="input-availability-price-winter"
+                      type="number"
+                      value={availabilityPriceWinter}
+                      onChange={(e) => setAvailabilityPriceWinter(Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="hours-per-day" className="text-sm">Timer pr dag</Label>
+                    <Input
+                      id="hours-per-day"
+                      data-testid="input-hours-per-day"
+                      type="number"
+                      value={hoursPerDay}
+                      onChange={(e) => setHoursPerDay(Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="activations-per-winter" className="text-sm">Aktiveringer pr vinter</Label>
+                    <Input
+                      id="activations-per-winter"
+                      data-testid="input-activations-per-winter"
+                      type="number"
+                      value={activationsPerWinter}
+                      onChange={(e) => setActivationsPerWinter(Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="activations" className="text-base">Antall aktiveringer per år</Label>
-                    <span className="text-lg font-semibold text-acron-lime" data-testid="text-activations">{activations}</span>
+                    <Label htmlFor="summer-factor" className="text-base">Tilgjengelighetspris sommer</Label>
+                    <span className="text-lg font-semibold text-acron-lime" data-testid="text-summer-factor">{summerFactor}% av vinter</span>
                   </div>
                   <Slider
-                    id="activations"
-                    data-testid="slider-activations"
+                    id="summer-factor"
+                    data-testid="slider-summer-factor"
                     min={0}
                     max={100}
-                    step={1}
-                    value={[activations]}
-                    onValueChange={(v) => setActivations(v[0])}
+                    step={5}
+                    value={[summerFactor]}
+                    onValueChange={(v) => setSummerFactor(v[0])}
                     className="py-2"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>0</span>
-                    <span>Referanse: {REFERENCE_DATA.activationsPerYear}</span>
-                    <span>100</span>
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    <div className="p-3 rounded-lg bg-muted/50" data-testid="info-availability-income">
-                      <p className="text-sm text-muted-foreground">Tilgjengelighetsinntekt</p>
-                      <p className="text-base font-semibold">{formatCurrency(REFERENCE_DATA.availabilityIncomePerKw)}/kW/år</p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-muted/50" data-testid="info-activation-income">
-                      <p className="text-sm text-muted-foreground">Aktiveringsinntekt ({activations} stk)</p>
-                      <p className="text-base font-semibold">{formatCurrency(activationIncomePerKw)}/kW/år</p>
-                    </div>
+                    <span>0%</span>
+                    <span>50% (standard)</span>
+                    <span>100%</span>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50" data-testid="info-usable-capacity">
-                  <Info className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <p className="text-sm text-muted-foreground">
-                    Utnyttbar kapasitet: <span className="font-medium text-foreground">{formatNumber(batteryCapacity * 0.8)} kWh</span> (80% av total kapasitet)
-                  </p>
+                <div className="grid sm:grid-cols-3 gap-3">
+                  <div className="p-3 rounded-lg bg-muted/50" data-testid="info-winter-income">
+                    <p className="text-sm text-muted-foreground">Vinter tilgj.</p>
+                    <p className="text-base font-semibold">{formatCurrency(flexBreakdown.pricePerWinter)}</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50" data-testid="info-summer-income">
+                    <p className="text-sm text-muted-foreground">Sommer tilgj.</p>
+                    <p className="text-base font-semibold">{formatCurrency(flexBreakdown.pricePerSummer)}</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50" data-testid="info-activation-sum">
+                    <p className="text-sm text-muted-foreground">Aktiveringssum</p>
+                    <p className="text-base font-semibold">{formatCurrency(flexBreakdown.activationSumWinter)}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -702,7 +795,6 @@ export default function CalculatorPage() {
                     <div className="flex items-center gap-2">
                       <Zap className="h-4 w-4 text-acron-lime" />
                       <span className="text-sm text-white/80">Fleksibilitetsmarked</span>
-                      <Badge variant="outline" className="text-[10px] border-acron-lime/50 text-acron-lime">Verifisert</Badge>
                     </div>
                     <span className="font-semibold" data-testid="text-flexibility-value">{formatCurrency(results.flexibilityIncome)}</span>
                   </div>
@@ -786,29 +878,24 @@ export default function CalculatorPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-xl" data-testid="card-reference-data">
+            <Card className="border-0 shadow-xl" data-testid="card-flex-breakdown">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  <CardTitle className="text-base">Dokumentert datagrunnlag</CardTitle>
+                  <Info className="h-5 w-5 text-acron-lime" />
+                  <CardTitle className="text-base">Fleksibilitetsberegning</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
-                <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800" data-testid="info-reference-project">
-                  <p className="font-medium text-green-800 dark:text-green-300 mb-1">Referanseprosjekt</p>
-                  <p className="text-green-700 dark:text-green-400">{REFERENCE_DATA.location}</p>
-                  <p className="text-green-600 dark:text-green-500 mt-1">
-                    Batteri: {REFERENCE_DATA.batteryPower} kW
-                  </p>
+                <div className="space-y-2 text-muted-foreground" data-testid="info-flex-breakdown">
+                  <p><span className="font-medium text-foreground">Pris pr time:</span> {formatCurrency(flexBreakdown.pricePerHour)}</p>
+                  <p><span className="font-medium text-foreground">Pris pr dag:</span> {formatCurrency(flexBreakdown.pricePerDay)}</p>
+                  <p><span className="font-medium text-foreground">Pris pr uke:</span> {formatCurrency(flexBreakdown.pricePerWeek)}</p>
+                  <p><span className="font-medium text-foreground">Pris pr måned:</span> {formatCurrency(flexBreakdown.pricePerMonth)}</p>
+                  <p className="pt-1 border-t"><span className="font-medium text-foreground">Vinter (6 mnd):</span> {formatCurrency(flexBreakdown.pricePerWinter)}</p>
+                  <p><span className="font-medium text-foreground">Sommer ({summerFactor}%):</span> {formatCurrency(flexBreakdown.pricePerSummer)}</p>
+                  <p><span className="font-medium text-foreground">Aktivering:</span> {formatCurrency(flexBreakdown.activationSumWinter)}</p>
+                  <p className="pt-1 border-t font-semibold text-foreground">Totalsum: {formatCurrency(flexBreakdown.totalFlexIncome)}/år</p>
                 </div>
-                <div className="space-y-2 text-muted-foreground" data-testid="info-reference-values">
-                  <p><span className="font-medium text-foreground">Tilgjengelighet:</span> {formatCurrency(REFERENCE_DATA.actualAvailabilityIncome)}/år</p>
-                  <p><span className="font-medium text-foreground">Aktiveringer:</span> {formatCurrency(REFERENCE_DATA.actualActivationIncome)}/år</p>
-                  <p className="pt-1 border-t"><span className="font-medium text-foreground">Total fleksinntekt:</span> {formatCurrency(REFERENCE_DATA.actualTotalFlexIncome)}/år</p>
-                </div>
-                <p className="text-xs text-muted-foreground italic pt-2 border-t" data-testid="text-data-source">
-                  Kilde: {REFERENCE_DATA.dataSource}
-                </p>
               </CardContent>
             </Card>
           </div>
@@ -822,8 +909,8 @@ export default function CalculatorPage() {
                 <h3 className="font-semibold text-lg" data-testid="text-limitations-title">Viktige begrensninger og forutsetninger</h3>
                 <ul className="space-y-2 text-muted-foreground" data-testid="list-limitations">
                   <li className="flex items-start gap-2">
-                    <span className="text-green-500 mt-1 font-bold">✓</span>
-                    <span><strong>Fleksibilitetsinntekter (VERIFISERT)</strong> er basert på faktiske, fakturerte tall fra {REFERENCE_DATA.location} og skalert lineært etter batterieffekt.</span>
+                    <span className="text-acron-lime mt-1 font-bold">•</span>
+                    <span><strong>Fleksibilitetsinntekter</strong> beregnes fra angitte priser (aktivering, tilgjengelighet vinter/sommer) og batterieffekt.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-yellow-500 mt-1 font-bold">!</span>
@@ -845,7 +932,7 @@ export default function CalculatorPage() {
 
         <footer className="mt-12 pt-8 border-t border-white/10 text-center text-white/50 text-sm" data-testid="footer">
           <p>Acron Energy System™ | Lønnsomhetskalkulator</p>
-          <p className="mt-1">Basert på dokumenterte resultater fra {REFERENCE_DATA.location}</p>
+          <p className="mt-1">Beregn lønnsomhet for ditt batteriprosjekt</p>
         </footer>
       </main>
     </div>
