@@ -30,12 +30,11 @@ const REFERENCE_DATA = {
   location: "Kristiansand Teknologipark",
   batteryPower: 230,
   availabilityIncomePerKw: 587,
-  activationIncomePerKw: 300,
-  totalFlexIncomePerKw: 891,
+  activationsPerYear: 40,
+  incomePerActivationPerKw: 7.5,
   actualAvailabilityIncome: 135000,
   actualActivationIncome: 69000,
   actualTotalFlexIncome: 205000,
-  activationsPerYear: 40,
   dataSource: "Faktiske, fakturerte tall fra Acron-driftet anlegg",
 };
 
@@ -97,11 +96,15 @@ export default function CalculatorPage() {
   const [solarProductionPerKwp, setSolarProductionPerKwp] = useState(SOLAR_REFERENCE.kwhPerKwp);
   const [selfConsumptionWithoutBattery, setSelfConsumptionWithoutBattery] = useState(SOLAR_REFERENCE.selfConsumptionWithoutBattery);
   const [selfConsumptionWithBattery, setSelfConsumptionWithBattery] = useState(SOLAR_REFERENCE.selfConsumptionWithBattery);
+  const [activations, setActivations] = useState(REFERENCE_DATA.activationsPerYear);
   const [investment, setInvestment] = useState(1200000);
   const [includeEstimates, setIncludeEstimates] = useState(true);
 
+  const activationIncomePerKw = activations * REFERENCE_DATA.incomePerActivationPerKw;
+  const totalFlexIncomePerKw = REFERENCE_DATA.availabilityIncomePerKw + activationIncomePerKw;
+
   const results = useMemo<CalculationResult>(() => {
-    const flexibilityIncome = batteryPower * REFERENCE_DATA.totalFlexIncomePerKw;
+    const flexibilityIncome = batteryPower * totalFlexIncomePerKw;
     
     let solarUtilizationValue = 0;
     if (includeSolar && solarCapacity > 0) {
@@ -138,7 +141,7 @@ export default function CalculatorPage() {
       paybackYears,
       roi,
     };
-  }, [batteryPower, batteryCapacity, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, selfConsumptionWithBattery, investment, includeEstimates]);
+  }, [batteryPower, batteryCapacity, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, selfConsumptionWithBattery, investment, includeEstimates, totalFlexIncomePerKw]);
 
   const generatePDF = async () => {
     const doc = new jsPDF();
@@ -197,6 +200,8 @@ export default function CalculatorPage() {
         ["Batterieffekt", `${formatNumber(batteryPower)} kW`],
         ["Batterikapasitet", `${formatNumber(batteryCapacity)} kWh`],
         ["Utnyttbar kapasitet (80%)", `${formatNumber(batteryCapacity * 0.8)} kWh`],
+        ["Antall aktiveringer", `${activations} per år`],
+        ["Fleksinntekt per kW", `${formatCurrency(totalFlexIncomePerKw)}/kW/år`],
         ...(includeSolar ? [
           ["Solcelleanlegg", `${formatNumber(solarCapacity)} kWp`],
           ["Solproduksjon (brukerangitt)", `${formatNumber(solarProductionPerKwp)} kWh/kWp/år`],
@@ -286,7 +291,7 @@ export default function CalculatorPage() {
       `Dokumentert fleksinntekt: ${formatCurrency(REFERENCE_DATA.actualTotalFlexIncome)}/år`,
       `  - Tilgjengelighetsinntekt: ${formatCurrency(REFERENCE_DATA.actualAvailabilityIncome)}/år`,
       `  - Aktiveringsinntekt (${REFERENCE_DATA.activationsPerYear} aktiveringer): ${formatCurrency(REFERENCE_DATA.actualActivationIncome)}/år`,
-      `Beregnet fleksinntekt per kW: ${formatCurrency(REFERENCE_DATA.totalFlexIncomePerKw)}/kW/år`,
+      `Beregnet fleksinntekt per kW: ${formatCurrency(totalFlexIncomePerKw)}/kW/år (${activations} aktiveringer)`,
     ];
     
     verifiedData.forEach((line) => {
@@ -405,7 +410,7 @@ export default function CalculatorPage() {
                   </Badge>
                 </div>
                 <CardDescription>
-                  Fleksinntekt beregnes fra dokumenterte tall: {formatCurrency(REFERENCE_DATA.totalFlexIncomePerKw)}/kW/år
+                  Fleksinntekt beregnes fra dokumenterte tall: {formatCurrency(totalFlexIncomePerKw)}/kW/år ({activations} aktiveringer)
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -448,6 +453,38 @@ export default function CalculatorPage() {
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>100 kWh</span>
                     <span>2000 kWh</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="activations" className="text-base">Antall aktiveringer per år</Label>
+                    <span className="text-lg font-semibold text-acron-lime" data-testid="text-activations">{activations}</span>
+                  </div>
+                  <Slider
+                    id="activations"
+                    data-testid="slider-activations"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={[activations]}
+                    onValueChange={(v) => setActivations(v[0])}
+                    className="py-2"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>0</span>
+                    <span>Referanse: {REFERENCE_DATA.activationsPerYear}</span>
+                    <span>100</span>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="p-3 rounded-lg bg-muted/50" data-testid="info-availability-income">
+                      <p className="text-sm text-muted-foreground">Tilgjengelighetsinntekt</p>
+                      <p className="text-base font-semibold">{formatCurrency(REFERENCE_DATA.availabilityIncomePerKw)}/kW/år</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/50" data-testid="info-activation-income">
+                      <p className="text-sm text-muted-foreground">Aktiveringsinntekt ({activations} stk)</p>
+                      <p className="text-base font-semibold">{formatCurrency(activationIncomePerKw)}/kW/år</p>
+                    </div>
                   </div>
                 </div>
                 
