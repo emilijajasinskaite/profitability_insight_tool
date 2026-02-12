@@ -465,7 +465,7 @@ export default function CalculatorPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="battery-power" className="text-base">Batterieffekt</Label>
-                    <span className="text-lg font-semibold text-acron-lime" data-testid="text-battery-power">{formatNumber(batteryPower)} kW ({batteryMW} MW)</span>
+                    <span className="text-lg font-semibold text-foreground" data-testid="text-battery-power">{formatNumber(batteryPower)} kW ({batteryMW} MW)</span>
                   </div>
                   <Slider
                     id="battery-power"
@@ -529,7 +529,7 @@ export default function CalculatorPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="summer-factor" className="text-base">Tilgjengelighetspris sommer</Label>
-                    <span className="text-lg font-semibold text-acron-lime" data-testid="text-summer-factor">{summerFactor}% av vinter</span>
+                    <span className="text-lg font-semibold text-foreground" data-testid="text-summer-factor">{summerFactor}% av vinter</span>
                   </div>
                   <Slider
                     id="summer-factor"
