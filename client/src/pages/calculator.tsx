@@ -483,6 +483,10 @@ export default function CalculatorPage() {
                   </div>
                 </div>
                 
+                <div className="space-y-1">
+                  <h4 className="text-sm font-semibold text-foreground">Vinterpriser og aktiveringer</h4>
+                  <p className="text-xs text-muted-foreground">Disse verdiene gjelder for vintersesongen (6 måneder)</p>
+                </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="activation-price" className="text-sm">Aktiveringspris (kr/MW)</Label>
