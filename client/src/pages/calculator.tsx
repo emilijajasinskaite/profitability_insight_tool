@@ -84,7 +84,6 @@ function formatPercent(num: number): string {
 
 export default function CalculatorPage() {
   const [batteryPower, setBatteryPower] = useState(250);
-  const [batteryCapacity, setBatteryCapacity] = useState(506);
   const [activationPrice, setActivationPrice] = useState(FLEX_DEFAULTS.activationPrice);
   const [availabilityPriceWinter, setAvailabilityPriceWinter] = useState(FLEX_DEFAULTS.availabilityPriceWinter);
   const [hoursPerDay, setHoursPerDay] = useState(FLEX_DEFAULTS.hoursPerDay);
@@ -140,8 +139,7 @@ export default function CalculatorPage() {
     
     if (includeEstimates) {
       peakShavingValue = batteryPower * ESTIMATES.peakShavingPerKw;
-      const usableCapacity = batteryCapacity * 0.80;
-      spotArbitrageValue = usableCapacity * ESTIMATES.spotArbitragePerKwh;
+      spotArbitrageValue = batteryPower * ESTIMATES.spotArbitragePerKwh;
     }
     
     const grossValue = flexibilityIncome + solarUtilizationValue + peakShavingValue + spotArbitrageValue;
@@ -162,7 +160,7 @@ export default function CalculatorPage() {
       paybackYears,
       roi,
     };
-  }, [batteryPower, batteryCapacity, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, selfConsumptionWithBattery, investment, includeEstimates, flexBreakdown]);
+  }, [batteryPower, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, selfConsumptionWithBattery, investment, includeEstimates, flexBreakdown]);
 
   const generatePDF = async () => {
     const doc = new jsPDF();
@@ -219,8 +217,6 @@ export default function CalculatorPage() {
       head: [["Parameter", "Verdi"]],
       body: [
         ["Batterieffekt", `${formatNumber(batteryPower)} kW (${batteryMW} MW)`],
-        ["Batterikapasitet", `${formatNumber(batteryCapacity)} kWh`],
-        ["Utnyttbar kapasitet (80%)", `${formatNumber(batteryCapacity * 0.8)} kWh`],
         ["Aktiveringspris", `${formatNumber(activationPrice)} kr/MW`],
         ["Tilgjengelighetspris vinter", `${formatNumber(availabilityPriceWinter)} kr/MW/t`],
         ["Timer/dag", `${hoursPerDay}`],
@@ -487,27 +483,6 @@ export default function CalculatorPage() {
                   </div>
                 </div>
                 
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="battery-capacity" className="text-base">Batterikapasitet</Label>
-                    <span className="text-lg font-semibold text-acron-lime" data-testid="text-battery-capacity">{formatNumber(batteryCapacity)} kWh</span>
-                  </div>
-                  <Slider
-                    id="battery-capacity"
-                    data-testid="slider-battery-capacity"
-                    min={100}
-                    max={2000}
-                    step={10}
-                    value={[batteryCapacity]}
-                    onValueChange={(v) => setBatteryCapacity(v[0])}
-                    className="py-2"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>100 kWh</span>
-                    <span>2000 kWh</span>
-                  </div>
-                </div>
-
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="activation-price" className="text-sm">Aktiveringspris (kr/MW)</Label>
