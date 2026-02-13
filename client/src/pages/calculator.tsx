@@ -489,7 +489,7 @@ export default function CalculatorPage() {
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="activation-price" className="text-sm">Aktiveringspris (kr/MW)</Label>
+                    <Label htmlFor="activation-price" className="text-sm">Aktiveringspris</Label>
                     <Input
                       id="activation-price"
                       data-testid="input-activation-price"
