@@ -95,7 +95,8 @@ export default function CalculatorPage() {
   const [solarProductionPerKwp, setSolarProductionPerKwp] = useState(SOLAR_REFERENCE.kwhPerKwp);
   const [selfConsumptionWithoutBattery, setSelfConsumptionWithoutBattery] = useState(SOLAR_REFERENCE.selfConsumptionWithoutBattery);
   const [selfConsumptionWithBattery, setSelfConsumptionWithBattery] = useState(SOLAR_REFERENCE.selfConsumptionWithBattery);
-  const [investment, setInvestment] = useState(1200000);
+  const [pricePerKwh, setPricePerKwh] = useState(2800);
+  const investment = batteryPower * pricePerKwh;
   const [includeEstimates, setIncludeEstimates] = useState(true);
 
   const batteryMW = batteryPower / 1000;
@@ -160,7 +161,7 @@ export default function CalculatorPage() {
       paybackYears,
       roi,
     };
-  }, [batteryPower, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, selfConsumptionWithBattery, investment, includeEstimates, flexBreakdown]);
+  }, [batteryPower, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, selfConsumptionWithBattery, investment, includeEstimates, flexBreakdown, pricePerKwh]);
 
   const generatePDF = async () => {
     const doc = new jsPDF();
@@ -230,7 +231,8 @@ export default function CalculatorPage() {
           ["Egenforbruk med batteri (brukerangitt)", `${selfConsumptionWithBattery}%`],
           ["Strømpris (brukerangitt)", `${spotPrice.toFixed(2)} kr/kWh`],
         ] : []),
-        ["Investering", formatCurrency(investment)],
+        ["Batteripris", `${formatNumber(pricePerKwh)} kr/kWh`],
+        ["Total investering", formatCurrency(investment)],
         ["Inkluderer estimater", includeEstimates ? "Ja" : "Nei"],
       ],
       theme: "striped",
@@ -744,18 +746,47 @@ export default function CalculatorPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="investment">Investeringsbeløp (NOK eks. mva)</Label>
-                  <Input
-                    id="investment"
-                    data-testid="input-investment"
-                    type="number"
-                    value={investment}
-                    onChange={(e) => setInvestment(Number(e.target.value))}
-                    className="text-lg"
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="price-per-kwh" className="text-base">Batteripris (kr/kWh)</Label>
+                    <span className="text-lg font-semibold text-foreground" data-testid="text-price-per-kwh">{formatNumber(pricePerKwh)} kr/kWh</span>
+                  </div>
+                  <Slider
+                    id="price-per-kwh"
+                    data-testid="slider-price-per-kwh"
+                    min={2000}
+                    max={3700}
+                    step={50}
+                    value={[pricePerKwh]}
+                    onValueChange={(v) => setPricePerKwh(v[0])}
+                    className="py-2"
                   />
-                  <p className="text-xs text-muted-foreground">Inkluderer typisk kraning, montasje og el.arbeider. Ekskluderer fundament.</p>
+                  <div className="relative h-4 mx-[10px]">
+                    {[2500, 2800, 3200].map((mark) => (
+                      <button
+                        key={mark}
+                        type="button"
+                        className="absolute flex flex-col items-center -translate-x-1/2 cursor-pointer"
+                        style={{ left: `${((mark - 2000) / (3700 - 2000)) * 100}%` }}
+                        onClick={() => setPricePerKwh(mark)}
+                        data-testid={`mark-${mark}`}
+                      >
+                        <span className="w-px h-2 bg-muted-foreground/50" />
+                        <span className={`text-[10px] mt-0.5 ${pricePerKwh === mark ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}>{formatNumber(mark)}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>2 000</span>
+                    <span>3 700</span>
+                  </div>
                 </div>
+                <div className="p-3 rounded-lg bg-muted/50" data-testid="info-total-investment">
+                  <p className="text-sm text-muted-foreground">Total investering</p>
+                  <p className="text-lg font-semibold">{formatCurrency(investment)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{formatNumber(batteryPower)} kWh x {formatNumber(pricePerKwh)} kr/kWh</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Inkluderer typisk kraning, montasje og el.arbeider. Ekskluderer fundament.</p>
               </CardContent>
             </Card>
           </div>
