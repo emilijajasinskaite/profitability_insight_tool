@@ -473,7 +473,7 @@ export default function CalculatorPage() {
                     data-testid="slider-battery-power"
                     min={50}
                     max={1000}
-                    step={10}
+                    step={5}
                     value={[batteryPower]}
                     onValueChange={(v) => setBatteryPower(v[0])}
                     className="py-2"
