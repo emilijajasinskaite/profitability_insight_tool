@@ -216,9 +216,9 @@ export default function CalculatorPage() {
       startY: 70,
       head: [["Parameter", "Verdi"]],
       body: [
-        ["Batterieffekt", `${formatNumber(batteryPower)} kW (${batteryMW} MW)`],
-        ["Aktiveringspris", `${formatNumber(activationPrice)} kr/MW`],
-        ["Tilgjengelighetspris vinter", `${formatNumber(availabilityPriceWinter)} kr/MW/t`],
+        ["Batterieffekt", `${formatNumber(batteryPower)} kWh (${batteryMW} MWh)`],
+        ["Aktiveringspris", `${formatNumber(activationPrice)} kr/MWh`],
+        ["Tilgjengelighetspris vinter", `${formatNumber(availabilityPriceWinter)} kr/MWh/t`],
         ["Timer/dag", `${hoursPerDay}`],
         ["Aktiveringer pr vinter", `${activationsPerWinter}`],
         ["Sommerinntekt", `${summerFactor}% av vinter`],
@@ -332,14 +332,14 @@ export default function CalculatorPage() {
     doc.setFont("helvetica", "normal");
     
     const dataLines = [
-      `Tilgjengelighetspris vinter: ${formatNumber(availabilityPriceWinter)} kr/MW/t`,
-      `Pris pr time: ${formatNumber(flexBreakdown.pricePerHour)} kr (${formatNumber(availabilityPriceWinter)} kr/MW/t x ${batteryMW} MW)`,
+      `Tilgjengelighetspris vinter: ${formatNumber(availabilityPriceWinter)} kr/MWh/t`,
+      `Pris pr time: ${formatNumber(flexBreakdown.pricePerHour)} kr (${formatNumber(availabilityPriceWinter)} kr/MWh/t x ${batteryMW} MWh)`,
       `Pris pr dag: ${formatNumber(flexBreakdown.pricePerDay)} kr (${hoursPerDay} timer/dag)`,
       `Pris pr uke: ${formatNumber(flexBreakdown.pricePerWeek)} kr (5 virkedager)`,
       `Pris pr måned: ${formatNumber(flexBreakdown.pricePerMonth)} kr (4 uker)`,
       `Pris pr vinter: ${formatNumber(flexBreakdown.pricePerWinter)} kr (6 måneder)`,
       `Pris pr sommer: ${formatNumber(flexBreakdown.pricePerSummer)} kr (${summerFactor}% av vinterinntekt)`,
-      `Aktiveringspris: ${formatNumber(activationPrice)} kr/MW x ${batteryMW} MW x ${activationsPerWinter} aktiveringer = ${formatNumber(flexBreakdown.activationSumWinter)} kr`,
+      `Aktiveringspris: ${formatNumber(activationPrice)} kr/MWh x ${batteryMW} MWh x ${activationsPerWinter} aktiveringer = ${formatNumber(flexBreakdown.activationSumWinter)} kr`,
     ];
     
     dataLines.forEach((line) => {
@@ -418,7 +418,7 @@ export default function CalculatorPage() {
       doc.text(`Side ${i} av ${totalPages}`, pageWidth - 40, doc.internal.pageSize.getHeight() - 10);
     }
     
-    doc.save(`acron-lønnsomhetsanalyse-${batteryPower}kW-${new Date().toISOString().split("T")[0]}.pdf`);
+    doc.save(`acron-lønnsomhetsanalyse-${batteryPower}kWh-${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
   return (
@@ -465,7 +465,7 @@ export default function CalculatorPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="battery-power" className="text-base">Batterieffekt</Label>
-                    <span className="text-lg font-semibold text-foreground" data-testid="text-battery-power">{formatNumber(batteryPower)} kW ({batteryMW} MW)</span>
+                    <span className="text-lg font-semibold text-foreground" data-testid="text-battery-power">{formatNumber(batteryPower)} kWh ({batteryMW} MWh)</span>
                   </div>
                   <Slider
                     id="battery-power"
@@ -478,8 +478,8 @@ export default function CalculatorPage() {
                     className="py-2"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>50 kW</span>
-                    <span>1000 kW</span>
+                    <span>50 kWh</span>
+                    <span>1000 kWh</span>
                   </div>
                 </div>
                 
@@ -489,7 +489,7 @@ export default function CalculatorPage() {
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="activation-price" className="text-sm">Aktiveringspris (kr/MW)</Label>
+                    <Label htmlFor="activation-price" className="text-sm">Aktiveringspris</Label>
                     <Input
                       id="activation-price"
                       data-testid="input-activation-price"
@@ -499,7 +499,7 @@ export default function CalculatorPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="availability-price-winter" className="text-sm">Tilgjengelighetspris vinter (kr/MW/t)</Label>
+                    <Label htmlFor="availability-price-winter" className="text-sm">Tilgjengelighetspris vinter (kr/MWh/t)</Label>
                     <Input
                       id="availability-price-winter"
                       data-testid="input-availability-price-winter"
