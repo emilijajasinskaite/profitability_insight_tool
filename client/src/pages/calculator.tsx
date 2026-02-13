@@ -375,7 +375,6 @@ export default function CalculatorPage() {
         estimateLines.push(`Peak shaving: ${ESTIMATES.peakShavingPerKw} kr/kW/år (estimat basert på typiske tariffer)`);
         estimateLines.push(`Spot-arbitrage: ${ESTIMATES.spotArbitragePerKwh} kr/kWh/år (estimat basert på historiske prisforskjeller)`);
       }
-      estimateLines.push(`Acron vederlag: ${formatPercent(ACRON_FEE_PERCENTAGE)} av samlet inntekt/besparelse`);
       
       estimateLines.forEach((line) => {
         doc.text(line, 20, yPos);
