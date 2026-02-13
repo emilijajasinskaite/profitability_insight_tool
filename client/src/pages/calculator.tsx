@@ -755,7 +755,7 @@ export default function CalculatorPage() {
                     data-testid="slider-price-per-kwh"
                     min={2200}
                     max={3500}
-                    step={50}
+                    step={100}
                     value={[pricePerKwh]}
                     onValueChange={(v) => setPricePerKwh(v[0])}
                     className="py-2"
