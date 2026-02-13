@@ -785,7 +785,6 @@ export default function CalculatorPage() {
                   <p className="text-lg font-semibold">{formatCurrency(investment)}</p>
                   <p className="text-xs text-muted-foreground mt-1">{formatNumber(batteryPower)} kWh x {formatNumber(pricePerKwh)} kr/kWh</p>
                 </div>
-                <p className="text-xs text-muted-foreground">Inkluderer typisk kraning, montasje og el.arbeider. Ekskluderer fundament.</p>
               </CardContent>
             </Card>
           </div>
@@ -931,7 +930,7 @@ export default function CalculatorPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-muted-foreground mt-1">•</span>
-                    <span><strong>Investering</strong> inkluderer ikke fundament eller spesielle tilpasninger. Ta kontakt for nøyaktig pristilbud.</span>
+                    <span><strong>Investering</strong> Ta kontakt for nøyaktig pristilbud.</span>
                   </li>
                 </ul>
               </div>
