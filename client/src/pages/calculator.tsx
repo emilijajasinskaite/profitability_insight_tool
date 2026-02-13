@@ -279,7 +279,7 @@ export default function CalculatorPage() {
       head: [["Beskrivelse", "Verdi"]],
       body: [
         ["Brutto verdiskaping", formatCurrency(results.grossValue) + "/år"],
-        ["Acron vederlag (15%)", formatCurrency(results.acronFee) + "/år"],
+        ["Acron vederlag", formatCurrency(results.acronFee) + "/år"],
         ["Netto til byggeier", formatCurrency(results.netValue) + "/år"],
         ["Tilbakebetalingstid", `${results.paybackYears.toFixed(1)} år`],
         ["Årlig avkastning (ROI)", formatPercent(results.roi)],
@@ -819,7 +819,7 @@ export default function CalculatorPage() {
                     <span className="font-semibold text-lg" data-testid="text-gross-value">{formatCurrency(results.grossValue)}/år</span>
                   </div>
                   <div className="flex items-center justify-between text-sm" data-testid="result-fee">
-                    <span className="text-white/60">Acron vederlag (15%)</span>
+                    <span className="text-white/60">Acron vederlag</span>
                     <span className="text-white/60" data-testid="text-fee-value">-{formatCurrency(results.acronFee)}</span>
                   </div>
                   <div className="flex items-center justify-between pt-2 border-t border-white/20" data-testid="result-net">
