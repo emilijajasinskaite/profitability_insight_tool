@@ -754,8 +754,8 @@ export default function CalculatorPage() {
                   <Slider
                     id="price-per-kwh"
                     data-testid="slider-price-per-kwh"
-                    min={2000}
-                    max={3700}
+                    min={2200}
+                    max={3500}
                     step={50}
                     value={[pricePerKwh]}
                     onValueChange={(v) => setPricePerKwh(v[0])}
@@ -767,7 +767,7 @@ export default function CalculatorPage() {
                         key={mark}
                         type="button"
                         className="absolute flex flex-col items-center -translate-x-1/2 cursor-pointer"
-                        style={{ left: `${((mark - 2000) / (3700 - 2000)) * 100}%` }}
+                        style={{ left: `${((mark - 2200) / (3500 - 2200)) * 100}%` }}
                         onClick={() => setPricePerKwh(mark)}
                         data-testid={`mark-${mark}`}
                       >
@@ -777,8 +777,8 @@ export default function CalculatorPage() {
                     ))}
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>2 000</span>
-                    <span>3 700</span>
+                    <span>2 200</span>
+                    <span>3 500</span>
                   </div>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/50" data-testid="info-total-investment">
