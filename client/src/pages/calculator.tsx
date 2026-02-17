@@ -498,25 +498,27 @@ export default function CalculatorPage() {
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <Label className="text-base">C-rate</Label>
-                  <div className="flex gap-2">
-                    {[0.5, 1, 1.5, 2].map((rate) => (
-                      <Button
-                        key={rate}
-                        type="button"
-                        variant={cRate === rate ? "default" : "outline"}
-                        onClick={() => setCRate(rate)}
-                        data-testid={`button-crate-${rate}`}
-                      >
-                        {rate.toString().replace(".", ",")}
-                      </Button>
-                    ))}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">C-rate</Label>
+                    <div className="flex gap-2">
+                      {[0.5, 1, 1.5, 2].map((rate) => (
+                        <Button
+                          key={rate}
+                          type="button"
+                          variant={cRate === rate ? "default" : "outline"}
+                          onClick={() => setCRate(rate)}
+                          data-testid={`button-crate-${rate}`}
+                        >
+                          {rate.toString().replace(".", ",")}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
-                  <div className="p-3 rounded-lg bg-muted/50" data-testid="info-battery-power">
+                  <div className="p-3 rounded-lg bg-muted/50 flex flex-col justify-center" data-testid="info-battery-power">
                     <p className="text-sm text-muted-foreground">Batterieffekt (beregnet)</p>
                     <p className="text-lg font-semibold">{formatNumber(batteryPower)} kW ({batteryMW} MW)</p>
-                    <p className="text-xs text-muted-foreground mt-1">{formatNumber(batteryCapacity)} kWh x {cRate.toString().replace(".", ",")} = {formatNumber(batteryPower)} kW</p>
+                    <p className="text-xs text-muted-foreground">{formatNumber(batteryCapacity)} kWh x {cRate.toString().replace(".", ",")} = {formatNumber(batteryPower)} kW</p>
                   </div>
                 </div>
                 
