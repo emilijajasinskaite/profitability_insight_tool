@@ -90,7 +90,9 @@ function formatPercent(num: number): string {
 }
 
 export default function CalculatorPage() {
-  const [batteryPower, setBatteryPower] = useState(250);
+  const [batteryCapacity, setBatteryCapacity] = useState(250);
+  const [cRate, setCRate] = useState(1);
+  const batteryPower = batteryCapacity * cRate;
   const [activationPrice, setActivationPrice] = useState(FLEX_DEFAULTS.activationPrice);
   const [availabilityPriceWinter, setAvailabilityPriceWinter] = useState(FLEX_DEFAULTS.availabilityPriceWinter);
   const [hoursPerDay, setHoursPerDay] = useState(FLEX_DEFAULTS.hoursPerDay);
@@ -104,7 +106,7 @@ export default function CalculatorPage() {
   const [increasedSelfConsumption, setIncreasedSelfConsumption] = useState(SOLAR_REFERENCE.increasedSelfConsumption);
   const selfConsumptionWithBattery = Math.min(selfConsumptionWithoutBattery + increasedSelfConsumption, 100);
   const [pricePerKwh, setPricePerKwh] = useState(2800);
-  const investment = batteryPower * pricePerKwh;
+  const investment = batteryCapacity * pricePerKwh;
   const [includeEstimates, setIncludeEstimates] = useState(true);
 
   const batteryMW = batteryPower / 1000;
@@ -225,6 +227,8 @@ export default function CalculatorPage() {
       startY: 70,
       head: [["Parameter", "Verdi"]],
       body: [
+        ["Batterikapasitet", `${formatNumber(batteryCapacity)} kWh`],
+        ["C-rate", `${cRate}`],
         ["Batterieffekt", `${formatNumber(batteryPower)} kW (${batteryMW} MW)`],
         ["Aktiveringspris", `${formatNumber(activationPrice)} kr/MWh`],
         ["Tilgjengelighetspris vinter", `${formatNumber(availabilityPriceWinter)} kr/MWh/t`],
@@ -429,7 +433,7 @@ export default function CalculatorPage() {
       doc.text(`Side ${i} av ${totalPages}`, pageWidth - 40, doc.internal.pageSize.getHeight() - 10);
     }
     
-    doc.save(`acron-lønnsomhetsanalyse-${batteryPower}kWh-${new Date().toISOString().split("T")[0]}.pdf`);
+    doc.save(`acron-lønnsomhetsanalyse-${batteryCapacity}kWh-${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
   return (
@@ -475,22 +479,44 @@ export default function CalculatorPage() {
               <CardContent className="space-y-6">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="battery-power" className="text-base">Batterieffekt</Label>
-                    <span className="text-lg font-semibold text-foreground" data-testid="text-battery-power">{formatNumber(batteryPower)} kW ({batteryMW} MW)</span>
+                    <Label htmlFor="battery-capacity" className="text-base">Batterikapasitet</Label>
+                    <span className="text-lg font-semibold text-foreground" data-testid="text-battery-capacity">{formatNumber(batteryCapacity)} kWh</span>
                   </div>
                   <Slider
-                    id="battery-power"
-                    data-testid="slider-battery-power"
+                    id="battery-capacity"
+                    data-testid="slider-battery-capacity"
                     min={50}
                     max={1000}
                     step={5}
-                    value={[batteryPower]}
-                    onValueChange={(v) => setBatteryPower(v[0])}
+                    value={[batteryCapacity]}
+                    onValueChange={(v) => setBatteryCapacity(v[0])}
                     className="py-2"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>50 kW</span>
-                    <span>1 000 kW</span>
+                    <span>50 kWh</span>
+                    <span>1 000 kWh</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-base">C-rate</Label>
+                  <div className="flex gap-2">
+                    {[0.5, 1, 1.5, 2].map((rate) => (
+                      <Button
+                        key={rate}
+                        type="button"
+                        variant={cRate === rate ? "default" : "outline"}
+                        onClick={() => setCRate(rate)}
+                        data-testid={`button-crate-${rate}`}
+                      >
+                        {rate.toString().replace(".", ",")}
+                      </Button>
+                    ))}
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50" data-testid="info-battery-power">
+                    <p className="text-sm text-muted-foreground">Batterieffekt (beregnet)</p>
+                    <p className="text-lg font-semibold">{formatNumber(batteryPower)} kW ({batteryMW} MW)</p>
+                    <p className="text-xs text-muted-foreground mt-1">{formatNumber(batteryCapacity)} kWh x {cRate.toString().replace(".", ",")} = {formatNumber(batteryPower)} kW</p>
                   </div>
                 </div>
                 
@@ -803,7 +829,7 @@ export default function CalculatorPage() {
                 <div className="p-3 rounded-lg bg-muted/50" data-testid="info-total-investment">
                   <p className="text-sm text-muted-foreground">Total investering</p>
                   <p className="text-lg font-semibold">{formatCurrency(investment)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{formatNumber(batteryPower)} kWh x {formatNumber(pricePerKwh)} kr/kWh</p>
+                  <p className="text-xs text-muted-foreground mt-1">{formatNumber(batteryCapacity)} kWh x {formatNumber(pricePerKwh)} kr/kWh</p>
                 </div>
               </CardContent>
             </Card>
