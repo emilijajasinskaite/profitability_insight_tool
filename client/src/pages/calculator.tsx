@@ -217,7 +217,7 @@ export default function CalculatorPage() {
       startY: 70,
       head: [["Parameter", "Verdi"]],
       body: [
-        ["Batterieffekt", `${formatNumber(batteryPower)} kWh (${batteryMW} MWh)`],
+        ["Batterieffekt", `${formatNumber(batteryPower)} kW (${batteryMW} MW)`],
         ["Aktiveringspris", `${formatNumber(activationPrice)} kr/MWh`],
         ["Tilgjengelighetspris vinter", `${formatNumber(availabilityPriceWinter)} kr/MWh/t`],
         ["Timer/dag", `${hoursPerDay}`],
@@ -466,7 +466,7 @@ export default function CalculatorPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="battery-power" className="text-base">Batterieffekt</Label>
-                    <span className="text-lg font-semibold text-foreground" data-testid="text-battery-power">{formatNumber(batteryPower)} kWh ({batteryMW} MWh)</span>
+                    <span className="text-lg font-semibold text-foreground" data-testid="text-battery-power">{formatNumber(batteryPower)} kW ({batteryMW} MW)</span>
                   </div>
                   <Slider
                     id="battery-power"
@@ -479,8 +479,8 @@ export default function CalculatorPage() {
                     className="py-2"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>50 kWh</span>
-                    <span>1000 kWh</span>
+                    <span>50 kW</span>
+                    <span>1000 kW</span>
                   </div>
                 </div>
                 
