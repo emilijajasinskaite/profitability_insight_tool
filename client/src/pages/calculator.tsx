@@ -61,6 +61,12 @@ interface CalculationResult {
   roi: number;
 }
 
+function parseFormattedNumber(str: string): number {
+  const cleaned = str.replace(/\s/g, "").replace(/,/g, ".");
+  const num = Number(cleaned);
+  return isNaN(num) ? 0 : num;
+}
+
 function formatNumber(num: number): string {
   return new Intl.NumberFormat("nb-NO", {
     maximumFractionDigits: 0,
@@ -498,9 +504,10 @@ export default function CalculatorPage() {
                     <Input
                       id="activation-price"
                       data-testid="input-activation-price"
-                      type="number"
-                      value={activationPrice}
-                      onChange={(e) => setActivationPrice(Number(e.target.value))}
+                      type="text"
+                      inputMode="numeric"
+                      value={formatNumber(activationPrice)}
+                      onChange={(e) => setActivationPrice(parseFormattedNumber(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
@@ -508,9 +515,10 @@ export default function CalculatorPage() {
                     <Input
                       id="availability-price-winter"
                       data-testid="input-availability-price-winter"
-                      type="number"
-                      value={availabilityPriceWinter}
-                      onChange={(e) => setAvailabilityPriceWinter(Number(e.target.value))}
+                      type="text"
+                      inputMode="numeric"
+                      value={formatNumber(availabilityPriceWinter)}
+                      onChange={(e) => setAvailabilityPriceWinter(parseFormattedNumber(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
@@ -518,9 +526,10 @@ export default function CalculatorPage() {
                     <Input
                       id="hours-per-day"
                       data-testid="input-hours-per-day"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={hoursPerDay}
-                      onChange={(e) => setHoursPerDay(Number(e.target.value))}
+                      onChange={(e) => setHoursPerDay(parseFormattedNumber(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
@@ -528,9 +537,10 @@ export default function CalculatorPage() {
                     <Input
                       id="activations-per-winter"
                       data-testid="input-activations-per-winter"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={activationsPerWinter}
-                      onChange={(e) => setActivationsPerWinter(Number(e.target.value))}
+                      onChange={(e) => setActivationsPerWinter(parseFormattedNumber(e.target.value))}
                     />
                   </div>
                 </div>
@@ -636,10 +646,10 @@ export default function CalculatorPage() {
                       <Input
                         id="solar-production"
                         data-testid="input-solar-production"
-                        type="number"
-                        min="0"
-                        value={solarProductionPerKwp}
-                        onChange={(e) => setSolarProductionPerKwp(Number(e.target.value))}
+                        type="text"
+                        inputMode="numeric"
+                        value={formatNumber(solarProductionPerKwp)}
+                        onChange={(e) => setSolarProductionPerKwp(parseFormattedNumber(e.target.value))}
                       />
                     </div>
                     <div className="space-y-2">
@@ -661,11 +671,10 @@ export default function CalculatorPage() {
                     <Input
                       id="self-consumption-without"
                       data-testid="input-self-consumption-without"
-                      type="number"
-                      min="0"
-                      max="100"
+                      type="text"
+                      inputMode="numeric"
                       value={selfConsumptionWithoutBattery}
-                      onChange={(e) => setSelfConsumptionWithoutBattery(Number(e.target.value))}
+                      onChange={(e) => setSelfConsumptionWithoutBattery(parseFormattedNumber(e.target.value))}
                     />
                   </div>
 
