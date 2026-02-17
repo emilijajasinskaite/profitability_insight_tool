@@ -91,7 +91,7 @@ function formatPercent(num: number): string {
 
 export default function CalculatorPage() {
   const [batteryCapacity, setBatteryCapacity] = useState(250);
-  const [cRate, setCRate] = useState(1);
+  const [cRate, setCRate] = useState(0.5);
   const batteryPower = batteryCapacity * cRate;
   const [activationPrice, setActivationPrice] = useState(FLEX_DEFAULTS.activationPrice);
   const [availabilityPriceWinter, setAvailabilityPriceWinter] = useState(FLEX_DEFAULTS.availabilityPriceWinter);
@@ -486,7 +486,7 @@ export default function CalculatorPage() {
                     id="battery-capacity"
                     data-testid="slider-battery-capacity"
                     min={50}
-                    max={1000}
+                    max={2000}
                     step={5}
                     value={[batteryCapacity]}
                     onValueChange={(v) => setBatteryCapacity(v[0])}
@@ -494,7 +494,7 @@ export default function CalculatorPage() {
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>50 kWh</span>
-                    <span>1 000 kWh</span>
+                    <span>2 000 kWh</span>
                   </div>
                 </div>
 
