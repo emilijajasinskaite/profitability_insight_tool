@@ -490,7 +490,7 @@ export default function CalculatorPage() {
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>50 kW</span>
-                    <span>1000 kW</span>
+                    <span>1 000 kW</span>
                   </div>
                 </div>
                 
@@ -636,7 +636,7 @@ export default function CalculatorPage() {
                     />
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>10 kWp</span>
-                      <span>1000 kWp</span>
+                      <span>1 000 kWp</span>
                     </div>
                   </div>
                   
