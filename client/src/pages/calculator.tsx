@@ -28,15 +28,15 @@ import acronLogo from "@/assets/acron-logo.png";
 const FLEX_DEFAULTS = {
   activationPrice: 10000,
   availabilityPriceWinter: 200,
-  hoursPerDay: 2,
-  activationsPerWinter: 7,
+  hoursPerDay: 4,
+  activationsPerWinter: 20,
   summerFactor: 50,
 };
 
 const SOLAR_REFERENCE = {
   source: "Holskogveien 76 prosjekteksempel",
   kwhPerKwp: 895,
-  selfConsumptionWithoutBattery: 30,
+  selfConsumptionWithoutBattery: 70,
   selfConsumptionWithBattery: 40,
   increasedSelfConsumption: 10,
   spotPricePerKwh: 1.10,
