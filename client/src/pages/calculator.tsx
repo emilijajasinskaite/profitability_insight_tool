@@ -28,16 +28,17 @@ import acronLogo from "@/assets/acron-logo.png";
 const FLEX_DEFAULTS = {
   activationPrice: 10000,
   availabilityPriceWinter: 200,
-  hoursPerDay: 2,
-  activationsPerWinter: 7,
+  hoursPerDay: 4,
+  activationsPerWinter: 20,
   summerFactor: 50,
 };
 
 const SOLAR_REFERENCE = {
   source: "Holskogveien 76 prosjekteksempel",
   kwhPerKwp: 895,
-  selfConsumptionWithoutBattery: 30,
-  selfConsumptionWithBattery: 43,
+  selfConsumptionWithoutBattery: 70,
+  selfConsumptionWithBattery: 40,
+  increasedSelfConsumption: 10,
   spotPricePerKwh: 1.10,
 };
 
@@ -58,6 +59,12 @@ interface CalculationResult {
   netValue: number;
   paybackYears: number;
   roi: number;
+}
+
+function parseFormattedNumber(str: string): number {
+  const cleaned = str.replace(/\s/g, "").replace(/,/g, ".");
+  const num = Number(cleaned);
+  return isNaN(num) ? 0 : num;
 }
 
 function formatNumber(num: number): string {
@@ -83,7 +90,9 @@ function formatPercent(num: number): string {
 }
 
 export default function CalculatorPage() {
-  const [batteryPower, setBatteryPower] = useState(250);
+  const [batteryCapacity, setBatteryCapacity] = useState(250);
+  const [cRate, setCRate] = useState(0.5);
+  const batteryPower = batteryCapacity * cRate;
   const [activationPrice, setActivationPrice] = useState(FLEX_DEFAULTS.activationPrice);
   const [availabilityPriceWinter, setAvailabilityPriceWinter] = useState(FLEX_DEFAULTS.availabilityPriceWinter);
   const [hoursPerDay, setHoursPerDay] = useState(FLEX_DEFAULTS.hoursPerDay);
@@ -94,9 +103,10 @@ export default function CalculatorPage() {
   const [spotPrice, setSpotPrice] = useState(SOLAR_REFERENCE.spotPricePerKwh);
   const [solarProductionPerKwp, setSolarProductionPerKwp] = useState(SOLAR_REFERENCE.kwhPerKwp);
   const [selfConsumptionWithoutBattery, setSelfConsumptionWithoutBattery] = useState(SOLAR_REFERENCE.selfConsumptionWithoutBattery);
-  const [selfConsumptionWithBattery, setSelfConsumptionWithBattery] = useState(SOLAR_REFERENCE.selfConsumptionWithBattery);
+  const [increasedSelfConsumption, setIncreasedSelfConsumption] = useState(SOLAR_REFERENCE.increasedSelfConsumption);
+  const selfConsumptionWithBattery = Math.min(selfConsumptionWithoutBattery + increasedSelfConsumption, 100);
   const [pricePerKwh, setPricePerKwh] = useState(2800);
-  const investment = batteryPower * pricePerKwh;
+  const investment = batteryCapacity * pricePerKwh;
   const [includeEstimates, setIncludeEstimates] = useState(true);
 
   const batteryMW = batteryPower / 1000;
@@ -161,7 +171,7 @@ export default function CalculatorPage() {
       paybackYears,
       roi,
     };
-  }, [batteryPower, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, selfConsumptionWithBattery, investment, includeEstimates, flexBreakdown, pricePerKwh]);
+  }, [batteryPower, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, increasedSelfConsumption, selfConsumptionWithBattery, investment, includeEstimates, flexBreakdown, pricePerKwh]);
 
   const generatePDF = async () => {
     const doc = new jsPDF();
@@ -217,7 +227,9 @@ export default function CalculatorPage() {
       startY: 70,
       head: [["Parameter", "Verdi"]],
       body: [
-        ["Batterieffekt", `${formatNumber(batteryPower)} kWh (${batteryMW} MWh)`],
+        ["Batterikapasitet", `${formatNumber(batteryCapacity)} kWh`],
+        ["C-rate", `${cRate}`],
+        ["Batterieffekt", `${formatNumber(batteryPower)} kW (${batteryMW} MW)`],
         ["Aktiveringspris", `${formatNumber(activationPrice)} kr/MWh`],
         ["Tilgjengelighetspris vinter", `${formatNumber(availabilityPriceWinter)} kr/MWh/t`],
         ["Timer/dag", `${hoursPerDay}`],
@@ -228,7 +240,8 @@ export default function CalculatorPage() {
           ["Solproduksjon (brukerangitt)", `${formatNumber(solarProductionPerKwp)} kWh/kWp/år`],
           ["Forventet årsproduksjon", `${formatNumber(solarCapacity * solarProductionPerKwp)} kWh`],
           ["Egenforbruk uten batteri (brukerangitt)", `${selfConsumptionWithoutBattery}%`],
-          ["Egenforbruk med batteri (brukerangitt)", `${selfConsumptionWithBattery}%`],
+          ["Økt egenforbruk med batteri (brukerangitt)", `+${increasedSelfConsumption}%`],
+          ["Egenforbruk med batteri", `${selfConsumptionWithBattery}%`],
           ["Strømpris (brukerangitt)", `${spotPrice.toFixed(2)} kr/kWh`],
         ] : []),
         ["Batteripris", `${formatNumber(pricePerKwh)} kr/kWh`],
@@ -251,7 +264,7 @@ export default function CalculatorPage() {
     ];
     
     if (includeSolar) {
-      tableBody.push(["Okt solutnyttelse (brukerangitt pris)", formatNumber(results.solarUtilizationValue), formatPercent(results.solarUtilizationValue / results.grossValue)]);
+      tableBody.push(["Økt solutnyttelse (brukerangitt pris)", formatNumber(results.solarUtilizationValue), formatPercent(results.solarUtilizationValue / results.grossValue)]);
     }
     
     if (includeEstimates) {
@@ -369,7 +382,8 @@ export default function CalculatorPage() {
         estimateLines.push(`Strømpris (brukerangitt): ${spotPrice.toFixed(2)} kr/kWh`);
         estimateLines.push(`Solproduksjon (brukerangitt): ${solarProductionPerKwp} kWh/kWp/år`);
         estimateLines.push(`Egenforbruk uten batteri (brukerangitt): ${selfConsumptionWithoutBattery}%`);
-        estimateLines.push(`Egenforbruk med batteri (brukerangitt): ${selfConsumptionWithBattery}%`);
+        estimateLines.push(`Økt egenforbruk med batteri (brukerangitt): +${increasedSelfConsumption}%`);
+        estimateLines.push(`Egenforbruk med batteri: ${selfConsumptionWithBattery}%`);
       }
       if (includeEstimates) {
         estimateLines.push(`Peak shaving: ${ESTIMATES.peakShavingPerKw} kr/kW/år (estimat basert på typiske tariffer)`);
@@ -401,9 +415,9 @@ export default function CalculatorPage() {
     doc.setFont("helvetica", "normal");
     const limitations = [
       "* Fleksinntekter er beregnet fra angitte priser og batterieffekt.",
-      "* Faktisk inntekt kan variere basert pa lokale nettforhold, markedssituasjon og batteritilgjengelighet.",
+      "* Faktisk inntekt kan variere basert på lokale nettforhold, markedssituasjon og batteritilgjengelighet.",
       "* Verdier merket ESTIMAT er ikke verifisert og kan variere betydelig.",
-      "* Ta kontakt med Acron for noyaktig prosjektvurdering.",
+      "* Ta kontakt med Acron for nøyaktig prosjektvurdering.",
     ];
     
     limitations.forEach((line, i) => {
@@ -419,7 +433,7 @@ export default function CalculatorPage() {
       doc.text(`Side ${i} av ${totalPages}`, pageWidth - 40, doc.internal.pageSize.getHeight() - 10);
     }
     
-    doc.save(`acron-lønnsomhetsanalyse-${batteryPower}kWh-${new Date().toISOString().split("T")[0]}.pdf`);
+    doc.save(`acron-lønnsomhetsanalyse-${batteryCapacity}kWh-${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
   return (
@@ -465,22 +479,46 @@ export default function CalculatorPage() {
               <CardContent className="space-y-6">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="battery-power" className="text-base">Batterieffekt</Label>
-                    <span className="text-lg font-semibold text-foreground" data-testid="text-battery-power">{formatNumber(batteryPower)} kWh ({batteryMW} MWh)</span>
+                    <Label htmlFor="battery-capacity" className="text-base">Batterikapasitet</Label>
+                    <span className="text-lg font-semibold text-foreground" data-testid="text-battery-capacity">{formatNumber(batteryCapacity)} kWh</span>
                   </div>
                   <Slider
-                    id="battery-power"
-                    data-testid="slider-battery-power"
+                    id="battery-capacity"
+                    data-testid="slider-battery-capacity"
                     min={50}
-                    max={1000}
+                    max={2000}
                     step={5}
-                    value={[batteryPower]}
-                    onValueChange={(v) => setBatteryPower(v[0])}
+                    value={[batteryCapacity]}
+                    onValueChange={(v) => setBatteryCapacity(v[0])}
                     className="py-2"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>50 kWh</span>
-                    <span>1000 kWh</span>
+                    <span>2 000 kWh</span>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">C-rate</Label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[0.5, 1, 1.5, 2].map((rate) => (
+                        <Button
+                          key={rate}
+                          type="button"
+                          variant={cRate === rate ? "default" : "outline"}
+                          onClick={() => setCRate(rate)}
+                          data-testid={`button-crate-${rate}`}
+                        >
+                          {rate.toString().replace(".", ",")}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/50 flex flex-col justify-center" data-testid="info-battery-power">
+                    <p className="text-sm text-muted-foreground">Batterieffekt (beregnet)</p>
+                    <p className="text-lg font-semibold">{formatNumber(batteryPower)} kW ({batteryMW} MW)</p>
+                    <p className="text-xs text-muted-foreground">{formatNumber(batteryCapacity)} kWh x {cRate.toString().replace(".", ",")} = {formatNumber(batteryPower)} kW</p>
                   </div>
                 </div>
                 
@@ -494,9 +532,10 @@ export default function CalculatorPage() {
                     <Input
                       id="activation-price"
                       data-testid="input-activation-price"
-                      type="number"
-                      value={activationPrice}
-                      onChange={(e) => setActivationPrice(Number(e.target.value))}
+                      type="text"
+                      inputMode="numeric"
+                      value={formatNumber(activationPrice)}
+                      onChange={(e) => setActivationPrice(parseFormattedNumber(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
@@ -504,9 +543,10 @@ export default function CalculatorPage() {
                     <Input
                       id="availability-price-winter"
                       data-testid="input-availability-price-winter"
-                      type="number"
-                      value={availabilityPriceWinter}
-                      onChange={(e) => setAvailabilityPriceWinter(Number(e.target.value))}
+                      type="text"
+                      inputMode="numeric"
+                      value={formatNumber(availabilityPriceWinter)}
+                      onChange={(e) => setAvailabilityPriceWinter(parseFormattedNumber(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
@@ -514,9 +554,10 @@ export default function CalculatorPage() {
                     <Input
                       id="hours-per-day"
                       data-testid="input-hours-per-day"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={hoursPerDay}
-                      onChange={(e) => setHoursPerDay(Number(e.target.value))}
+                      onChange={(e) => setHoursPerDay(parseFormattedNumber(e.target.value))}
                     />
                   </div>
                   <div className="space-y-2">
@@ -524,9 +565,10 @@ export default function CalculatorPage() {
                     <Input
                       id="activations-per-winter"
                       data-testid="input-activations-per-winter"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={activationsPerWinter}
-                      onChange={(e) => setActivationsPerWinter(Number(e.target.value))}
+                      onChange={(e) => setActivationsPerWinter(parseFormattedNumber(e.target.value))}
                     />
                   </div>
                 </div>
@@ -622,7 +664,7 @@ export default function CalculatorPage() {
                     />
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>10 kWp</span>
-                      <span>1000 kWp</span>
+                      <span>1 000 kWp</span>
                     </div>
                   </div>
                   
@@ -632,10 +674,10 @@ export default function CalculatorPage() {
                       <Input
                         id="solar-production"
                         data-testid="input-solar-production"
-                        type="number"
-                        min="0"
-                        value={solarProductionPerKwp}
-                        onChange={(e) => setSolarProductionPerKwp(Number(e.target.value))}
+                        type="text"
+                        inputMode="numeric"
+                        value={formatNumber(solarProductionPerKwp)}
+                        onChange={(e) => setSolarProductionPerKwp(parseFormattedNumber(e.target.value))}
                       />
                     </div>
                     <div className="space-y-2">
@@ -652,41 +694,47 @@ export default function CalculatorPage() {
                     </div>
                   </div>
                   
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="self-consumption-without">Egenforbruk uten batteri (%)</Label>
-                      <Input
-                        id="self-consumption-without"
-                        data-testid="input-self-consumption-without"
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={selfConsumptionWithoutBattery}
-                        onChange={(e) => setSelfConsumptionWithoutBattery(Number(e.target.value))}
-                      />
+                  <div className="space-y-2">
+                    <Label htmlFor="self-consumption-without">Egenforbruk uten batteri (%)</Label>
+                    <Input
+                      id="self-consumption-without"
+                      data-testid="input-self-consumption-without"
+                      type="text"
+                      inputMode="numeric"
+                      value={selfConsumptionWithoutBattery}
+                      onChange={(e) => setSelfConsumptionWithoutBattery(parseFormattedNumber(e.target.value))}
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="increased-self-consumption" className="text-sm">Økt egenforbruk med batteri (%)</Label>
+                      <span className="text-sm font-semibold text-foreground" data-testid="text-increased-self-consumption">+{increasedSelfConsumption}%</span>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="self-consumption-with">Egenforbruk med batteri (%)</Label>
-                      <Input
-                        id="self-consumption-with"
-                        data-testid="input-self-consumption-with"
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={selfConsumptionWithBattery}
-                        onChange={(e) => setSelfConsumptionWithBattery(Number(e.target.value))}
-                      />
+                    <Slider
+                      id="increased-self-consumption"
+                      data-testid="slider-increased-self-consumption"
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={[increasedSelfConsumption]}
+                      onValueChange={(v) => setIncreasedSelfConsumption(v[0])}
+                      className="py-2"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>0%</span>
+                      <span>100%</span>
                     </div>
                   </div>
-                  
+
                   <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="p-3 rounded-lg bg-muted/50" data-testid="info-self-consumption-with">
+                      <p className="text-sm text-muted-foreground">Egenforbruk med batteri</p>
+                      <p className="text-lg font-semibold">{selfConsumptionWithBattery}%</p>
+                    </div>
                     <div className="p-3 rounded-lg bg-muted/50" data-testid="info-solar-production">
                       <p className="text-sm text-muted-foreground">Forventet årsproduksjon</p>
                       <p className="text-lg font-semibold">{formatNumber(solarCapacity * solarProductionPerKwp)} kWh</p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-muted/50" data-testid="info-solar-increase">
-                      <p className="text-sm text-muted-foreground">Økt egenforbruk med batteri</p>
-                      <p className="text-lg font-semibold">+{selfConsumptionWithBattery - selfConsumptionWithoutBattery}%</p>
                     </div>
                   </div>
                 </CardContent>
@@ -783,7 +831,7 @@ export default function CalculatorPage() {
                 <div className="p-3 rounded-lg bg-muted/50" data-testid="info-total-investment">
                   <p className="text-sm text-muted-foreground">Total investering</p>
                   <p className="text-lg font-semibold">{formatCurrency(investment)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{formatNumber(batteryPower)} kWh x {formatNumber(pricePerKwh)} kr/kWh</p>
+                  <p className="text-xs text-muted-foreground mt-1">{formatNumber(batteryCapacity)} kWh x {formatNumber(pricePerKwh)} kr/kWh</p>
                 </div>
               </CardContent>
             </Card>
