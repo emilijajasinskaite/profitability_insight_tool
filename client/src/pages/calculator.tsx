@@ -260,7 +260,7 @@ export default function CalculatorPage() {
     ];
     
     if (includeSolar) {
-      tableBody.push(["Okt solutnyttelse (brukerangitt pris)", formatNumber(results.solarUtilizationValue), formatPercent(results.solarUtilizationValue / results.grossValue)]);
+      tableBody.push(["Økt solutnyttelse (brukerangitt pris)", formatNumber(results.solarUtilizationValue), formatPercent(results.solarUtilizationValue / results.grossValue)]);
     }
     
     if (includeEstimates) {
@@ -411,9 +411,9 @@ export default function CalculatorPage() {
     doc.setFont("helvetica", "normal");
     const limitations = [
       "* Fleksinntekter er beregnet fra angitte priser og batterieffekt.",
-      "* Faktisk inntekt kan variere basert pa lokale nettforhold, markedssituasjon og batteritilgjengelighet.",
+      "* Faktisk inntekt kan variere basert på lokale nettforhold, markedssituasjon og batteritilgjengelighet.",
       "* Verdier merket ESTIMAT er ikke verifisert og kan variere betydelig.",
-      "* Ta kontakt med Acron for noyaktig prosjektvurdering.",
+      "* Ta kontakt med Acron for nøyaktig prosjektvurdering.",
     ];
     
     limitations.forEach((line, i) => {
