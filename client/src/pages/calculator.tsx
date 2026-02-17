@@ -501,7 +501,7 @@ export default function CalculatorPage() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-sm">C-rate</Label>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-4 gap-2">
                       {[0.5, 1, 1.5, 2].map((rate) => (
                         <Button
                           key={rate}
