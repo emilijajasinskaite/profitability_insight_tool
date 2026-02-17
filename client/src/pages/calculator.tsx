@@ -37,7 +37,8 @@ const SOLAR_REFERENCE = {
   source: "Holskogveien 76 prosjekteksempel",
   kwhPerKwp: 895,
   selfConsumptionWithoutBattery: 30,
-  selfConsumptionWithBattery: 43,
+  selfConsumptionWithBattery: 40,
+  increasedSelfConsumption: 10,
   spotPricePerKwh: 1.10,
 };
 
@@ -94,7 +95,8 @@ export default function CalculatorPage() {
   const [spotPrice, setSpotPrice] = useState(SOLAR_REFERENCE.spotPricePerKwh);
   const [solarProductionPerKwp, setSolarProductionPerKwp] = useState(SOLAR_REFERENCE.kwhPerKwp);
   const [selfConsumptionWithoutBattery, setSelfConsumptionWithoutBattery] = useState(SOLAR_REFERENCE.selfConsumptionWithoutBattery);
-  const [selfConsumptionWithBattery, setSelfConsumptionWithBattery] = useState(SOLAR_REFERENCE.selfConsumptionWithBattery);
+  const [increasedSelfConsumption, setIncreasedSelfConsumption] = useState(SOLAR_REFERENCE.increasedSelfConsumption);
+  const selfConsumptionWithBattery = Math.min(selfConsumptionWithoutBattery + increasedSelfConsumption, 100);
   const [pricePerKwh, setPricePerKwh] = useState(2800);
   const investment = batteryPower * pricePerKwh;
   const [includeEstimates, setIncludeEstimates] = useState(true);
@@ -161,7 +163,7 @@ export default function CalculatorPage() {
       paybackYears,
       roi,
     };
-  }, [batteryPower, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, selfConsumptionWithBattery, investment, includeEstimates, flexBreakdown, pricePerKwh]);
+  }, [batteryPower, includeSolar, solarCapacity, spotPrice, solarProductionPerKwp, selfConsumptionWithoutBattery, increasedSelfConsumption, selfConsumptionWithBattery, investment, includeEstimates, flexBreakdown, pricePerKwh]);
 
   const generatePDF = async () => {
     const doc = new jsPDF();
@@ -228,7 +230,8 @@ export default function CalculatorPage() {
           ["Solproduksjon (brukerangitt)", `${formatNumber(solarProductionPerKwp)} kWh/kWp/år`],
           ["Forventet årsproduksjon", `${formatNumber(solarCapacity * solarProductionPerKwp)} kWh`],
           ["Egenforbruk uten batteri (brukerangitt)", `${selfConsumptionWithoutBattery}%`],
-          ["Egenforbruk med batteri (brukerangitt)", `${selfConsumptionWithBattery}%`],
+          ["Økt egenforbruk med batteri (brukerangitt)", `+${increasedSelfConsumption}%`],
+          ["Egenforbruk med batteri", `${selfConsumptionWithBattery}%`],
           ["Strømpris (brukerangitt)", `${spotPrice.toFixed(2)} kr/kWh`],
         ] : []),
         ["Batteripris", `${formatNumber(pricePerKwh)} kr/kWh`],
@@ -369,7 +372,8 @@ export default function CalculatorPage() {
         estimateLines.push(`Strømpris (brukerangitt): ${spotPrice.toFixed(2)} kr/kWh`);
         estimateLines.push(`Solproduksjon (brukerangitt): ${solarProductionPerKwp} kWh/kWp/år`);
         estimateLines.push(`Egenforbruk uten batteri (brukerangitt): ${selfConsumptionWithoutBattery}%`);
-        estimateLines.push(`Egenforbruk med batteri (brukerangitt): ${selfConsumptionWithBattery}%`);
+        estimateLines.push(`Økt egenforbruk med batteri (brukerangitt): +${increasedSelfConsumption}%`);
+        estimateLines.push(`Egenforbruk med batteri: ${selfConsumptionWithBattery}%`);
       }
       if (includeEstimates) {
         estimateLines.push(`Peak shaving: ${ESTIMATES.peakShavingPerKw} kr/kW/år (estimat basert på typiske tariffer)`);
@@ -652,41 +656,48 @@ export default function CalculatorPage() {
                     </div>
                   </div>
                   
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="self-consumption-without">Egenforbruk uten batteri (%)</Label>
-                      <Input
-                        id="self-consumption-without"
-                        data-testid="input-self-consumption-without"
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={selfConsumptionWithoutBattery}
-                        onChange={(e) => setSelfConsumptionWithoutBattery(Number(e.target.value))}
-                      />
+                  <div className="space-y-2">
+                    <Label htmlFor="self-consumption-without">Egenforbruk uten batteri (%)</Label>
+                    <Input
+                      id="self-consumption-without"
+                      data-testid="input-self-consumption-without"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={selfConsumptionWithoutBattery}
+                      onChange={(e) => setSelfConsumptionWithoutBattery(Number(e.target.value))}
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="increased-self-consumption" className="text-sm">Økt egenforbruk med batteri (%)</Label>
+                      <span className="text-sm font-semibold text-foreground" data-testid="text-increased-self-consumption">+{increasedSelfConsumption}%</span>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="self-consumption-with">Egenforbruk med batteri (%)</Label>
-                      <Input
-                        id="self-consumption-with"
-                        data-testid="input-self-consumption-with"
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={selfConsumptionWithBattery}
-                        onChange={(e) => setSelfConsumptionWithBattery(Number(e.target.value))}
-                      />
+                    <Slider
+                      id="increased-self-consumption"
+                      data-testid="slider-increased-self-consumption"
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={[increasedSelfConsumption]}
+                      onValueChange={(v) => setIncreasedSelfConsumption(v[0])}
+                      className="py-2"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>0%</span>
+                      <span>100%</span>
                     </div>
                   </div>
-                  
+
                   <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="p-3 rounded-lg bg-muted/50" data-testid="info-self-consumption-with">
+                      <p className="text-sm text-muted-foreground">Egenforbruk med batteri</p>
+                      <p className="text-lg font-semibold">{selfConsumptionWithBattery}%</p>
+                    </div>
                     <div className="p-3 rounded-lg bg-muted/50" data-testid="info-solar-production">
                       <p className="text-sm text-muted-foreground">Forventet årsproduksjon</p>
                       <p className="text-lg font-semibold">{formatNumber(solarCapacity * solarProductionPerKwp)} kWh</p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-muted/50" data-testid="info-solar-increase">
-                      <p className="text-sm text-muted-foreground">Økt egenforbruk med batteri</p>
-                      <p className="text-lg font-semibold">+{selfConsumptionWithBattery - selfConsumptionWithoutBattery}%</p>
                     </div>
                   </div>
                 </CardContent>
