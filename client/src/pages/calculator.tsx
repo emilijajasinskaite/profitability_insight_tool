@@ -283,7 +283,7 @@ export default function CalculatorPage() {
       head: [["Beskrivelse", "Verdi"]],
       body: [
         ["Brutto verdiskaping", formatCurrency(results.grossValue) + "/år"],
-        ["Acron vederlag", formatCurrency(results.acronFee) + "/år"],
+        ["VARO vederlag", formatCurrency(results.acronFee) + "/år"],
         ["Netto til byggeier", formatCurrency(results.netValue) + "/år"],
         ["Tilbakebetalingstid", `${results.paybackYears.toFixed(1)} år`],
         ["Årlig avkastning (ROI)", formatPercent(results.roi)],
@@ -406,7 +406,7 @@ export default function CalculatorPage() {
       "* Fleksinntekter er beregnet fra angitte priser og batterieffekt.",
       "* Faktisk inntekt kan variere basert på lokale nettforhold, markedssituasjon og batteritilgjengelighet.",
       "* Verdier merket ESTIMAT er ikke verifisert og kan variere betydelig.",
-      "* Ta kontakt med Acron for nøyaktig prosjektvurdering.",
+      "* Ta kontakt med VARO for nøyaktig prosjektvurdering.",
     ];
     
     limitations.forEach((line, i) => {
@@ -418,11 +418,11 @@ export default function CalculatorPage() {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(128, 128, 128);
-      doc.text("Acron Energy System - Lønnsomhetskalkulator", 20, doc.internal.pageSize.getHeight() - 10);
+      doc.text("VARO - Lønnsomhetskalkulator", 20, doc.internal.pageSize.getHeight() - 10);
       doc.text(`Side ${i} av ${totalPages}`, pageWidth - 40, doc.internal.pageSize.getHeight() - 10);
     }
     
-    doc.save(`acron-lønnsomhetsanalyse-${batteryCapacity}kWh-${new Date().toISOString().split("T")[0]}.pdf`);
+    doc.save(`varo-lønnsomhetsanalyse-${batteryCapacity}kWh-${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
   return (
@@ -885,7 +885,7 @@ export default function CalculatorPage() {
                     <span className="font-semibold text-lg" data-testid="text-gross-value">{formatCurrency(results.grossValue)}/år</span>
                   </div>
                   <div className="flex items-center justify-between text-sm" data-testid="result-fee">
-                    <span className="text-white/60">Acron vederlag</span>
+                    <span className="text-white/60">VARO vederlag</span>
                     <span className="text-white/60" data-testid="text-fee-value">-{formatCurrency(results.acronFee)}</span>
                   </div>
                   <div className="flex items-center justify-between pt-2 border-t border-white/20" data-testid="result-net">
@@ -976,7 +976,7 @@ export default function CalculatorPage() {
         </Card>
 
         <footer className="mt-12 pt-8 border-t border-white/10 text-center text-white/50 text-sm" data-testid="footer">
-          <p>Acron Energy System™ | Lønnsomhetskalkulator</p>
+          <p>VARO™ | Lønnsomhetskalkulator</p>
           <p className="mt-1">Beregn lønnsomhet for ditt batteriprosjekt</p>
         </footer>
       </main>
