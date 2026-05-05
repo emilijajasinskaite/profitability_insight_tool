@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import acronLogo from "@/assets/acron-logo.png";
+import varoLogoWhite from "@assets/VARO_Logo_White_1777969901070.png";
 
 const FLEX_DEFAULTS = {
   activationPrice: 10000,
@@ -186,29 +186,18 @@ export default function CalculatorPage() {
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
         img.onerror = reject;
-        img.src = acronLogo;
+        img.src = varoLogoWhite;
       });
-      
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext("2d")!;
-      ctx.filter = "invert(1)";
-      ctx.drawImage(img, 0, 0);
-      const invertedLogo = canvas.toDataURL("image/png");
       
       const logoHeight = 10;
       const aspectRatio = img.width / img.height;
       const logoWidth = logoHeight * aspectRatio;
-      doc.addImage(invertedLogo, "PNG", 20, 17, logoWidth, logoHeight);
+      doc.addImage(varoLogoWhite, "PNG", 20, 17, logoWidth, logoHeight);
     } catch {
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
       doc.setFont("helvetica", "bold");
-      doc.text("ACRON", 20, 25);
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      doc.text("Energy System", 55, 25);
+      doc.text("VARO", 20, 25);
     }
     
     doc.setTextColor(255, 255, 255);
@@ -442,9 +431,9 @@ export default function CalculatorPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center">
             <img 
-              src={acronLogo} 
-              alt="Acron Energy System" 
-              className="h-6 brightness-0 invert sepia saturate-[10000%] hue-rotate-[22deg]" 
+              src={varoLogoWhite} 
+              alt="VARO" 
+              className="h-6" 
               data-testid="img-logo" 
             />
           </div>
