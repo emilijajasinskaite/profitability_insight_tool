@@ -1,7 +1,7 @@
-# Acron Battery Profitability Calculator
+# VARO Battery Profitability Calculator
 
 ## Overview
-A profitability calculator for battery systems with flexibility market integration, solar energy utilization, peak shaving, and spot arbitrage. Built for Acron Energy System to help internal sellers and potential customers evaluate battery investments.
+A profitability calculator for battery systems with flexibility market integration, solar energy utilization, peak shaving, and spot arbitrage. Built for VARO to help internal sellers and potential customers evaluate battery investments.
 
 ## Current State
 - **Status**: MVP Complete
@@ -11,7 +11,7 @@ A profitability calculator for battery systems with flexibility market integrati
 
 ### Frontend (client/)
 - **Framework**: React with TypeScript
-- **Styling**: Tailwind CSS with Acron brand colors (lime green #D4FF00, dark charcoal)
+- **Styling**: Tailwind CSS with VARO brand colors (lime green #D4FF00, dark charcoal)
 - **UI Components**: Shadcn/ui
 - **Key Page**: `/` - Calculator page
 
@@ -56,7 +56,7 @@ A profitability calculator for battery systems with flexibility market integrati
 - Spot arbitrage: 23.7 kr/kWh/year
 
 **Fixed Fees:**
-- Acron vederlag: 15% of total value
+- VARO vederlag: 15% of total value
 
 ### Important Limitations (displayed in UI and PDF)
 1. Flex income is calculated from user-configurable prices and battery effect
@@ -70,12 +70,12 @@ client/src/
 ├── pages/
 │   └── calculator.tsx    # Main calculator page with PDF generation
 ├── components/ui/        # Shadcn components
-├── index.css            # Acron theme colors
+├── index.css            # VARO theme colors
 └── App.tsx              # Router configuration
 ```
 
 ## User Preferences
 - Norwegian language (nb-NO)
-- Acron brand colors: Lime green (#D4FF00), dark charcoal
-- Clean, modern design matching Acron Energy System
+- VARO brand colors: Lime green (#D4FF00), dark charcoal
+- Clean, modern design matching VARO brand
 - Transparent about data sources with clear "Estimat" labeling

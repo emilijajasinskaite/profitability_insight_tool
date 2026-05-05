@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import acronLogo from "@/assets/acron-logo.png";
+import varoLogoWhite from "@assets/VARO_Logo_White_1777969901070.png";
 
 const FLEX_DEFAULTS = {
   activationPrice: 10000,
@@ -186,29 +186,18 @@ export default function CalculatorPage() {
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
         img.onerror = reject;
-        img.src = acronLogo;
+        img.src = varoLogoWhite;
       });
-      
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext("2d")!;
-      ctx.filter = "invert(1)";
-      ctx.drawImage(img, 0, 0);
-      const invertedLogo = canvas.toDataURL("image/png");
       
       const logoHeight = 10;
       const aspectRatio = img.width / img.height;
       const logoWidth = logoHeight * aspectRatio;
-      doc.addImage(invertedLogo, "PNG", 20, 17, logoWidth, logoHeight);
+      doc.addImage(varoLogoWhite, "PNG", 20, 17, logoWidth, logoHeight);
     } catch {
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
       doc.setFont("helvetica", "bold");
-      doc.text("ACRON", 20, 25);
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      doc.text("Energy System", 55, 25);
+      doc.text("VARO", 20, 25);
     }
     
     doc.setTextColor(255, 255, 255);
@@ -417,7 +406,7 @@ export default function CalculatorPage() {
       "* Fleksinntekter er beregnet fra angitte priser og batterieffekt.",
       "* Faktisk inntekt kan variere basert på lokale nettforhold, markedssituasjon og batteritilgjengelighet.",
       "* Verdier merket ESTIMAT er ikke verifisert og kan variere betydelig.",
-      "* Ta kontakt med Acron for nøyaktig prosjektvurdering.",
+      "* Ta kontakt med VARO for nøyaktig prosjektvurdering.",
     ];
     
     limitations.forEach((line, i) => {
@@ -429,11 +418,11 @@ export default function CalculatorPage() {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(128, 128, 128);
-      doc.text("Acron Energy System - Lønnsomhetskalkulator", 20, doc.internal.pageSize.getHeight() - 10);
+      doc.text("Acron - Lønnsomhetskalkulator", 20, doc.internal.pageSize.getHeight() - 10);
       doc.text(`Side ${i} av ${totalPages}`, pageWidth - 40, doc.internal.pageSize.getHeight() - 10);
     }
     
-    doc.save(`acron-lønnsomhetsanalyse-${batteryCapacity}kWh-${new Date().toISOString().split("T")[0]}.pdf`);
+    doc.save(`varo-lønnsomhetsanalyse-${batteryCapacity}kWh-${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
   return (
@@ -442,9 +431,9 @@ export default function CalculatorPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center">
             <img 
-              src={acronLogo} 
-              alt="Acron Energy System" 
-              className="h-6 brightness-0 invert sepia saturate-[10000%] hue-rotate-[22deg]" 
+              src={varoLogoWhite} 
+              alt="VARO" 
+              className="h-6" 
               data-testid="img-logo" 
             />
           </div>
@@ -987,7 +976,7 @@ export default function CalculatorPage() {
         </Card>
 
         <footer className="mt-12 pt-8 border-t border-white/10 text-center text-white/50 text-sm" data-testid="footer">
-          <p>Acron Energy System™ | Lønnsomhetskalkulator</p>
+          <p>VARO | Lønnsomhetskalkulator</p>
           <p className="mt-1">Beregn lønnsomhet for ditt batteriprosjekt</p>
         </footer>
       </main>
