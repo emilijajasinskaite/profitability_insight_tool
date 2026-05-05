@@ -283,7 +283,7 @@ export default function CalculatorPage() {
       head: [["Beskrivelse", "Verdi"]],
       body: [
         ["Brutto verdiskaping", formatCurrency(results.grossValue) + "/år"],
-        ["VARO vederlag", formatCurrency(results.acronFee) + "/år"],
+        ["Acron vederlag", formatCurrency(results.acronFee) + "/år"],
         ["Netto til byggeier", formatCurrency(results.netValue) + "/år"],
         ["Tilbakebetalingstid", `${results.paybackYears.toFixed(1)} år`],
         ["Årlig avkastning (ROI)", formatPercent(results.roi)],
@@ -418,7 +418,7 @@ export default function CalculatorPage() {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(128, 128, 128);
-      doc.text("VARO - Lønnsomhetskalkulator", 20, doc.internal.pageSize.getHeight() - 10);
+      doc.text("Acron - Lønnsomhetskalkulator", 20, doc.internal.pageSize.getHeight() - 10);
       doc.text(`Side ${i} av ${totalPages}`, pageWidth - 40, doc.internal.pageSize.getHeight() - 10);
     }
     
@@ -885,7 +885,7 @@ export default function CalculatorPage() {
                     <span className="font-semibold text-lg" data-testid="text-gross-value">{formatCurrency(results.grossValue)}/år</span>
                   </div>
                   <div className="flex items-center justify-between text-sm" data-testid="result-fee">
-                    <span className="text-white/60">VARO vederlag</span>
+                    <span className="text-white/60">Acron vederlag</span>
                     <span className="text-white/60" data-testid="text-fee-value">-{formatCurrency(results.acronFee)}</span>
                   </div>
                   <div className="flex items-center justify-between pt-2 border-t border-white/20" data-testid="result-net">
