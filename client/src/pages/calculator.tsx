@@ -976,7 +976,7 @@ export default function CalculatorPage() {
         </Card>
 
         <footer className="mt-12 pt-8 border-t border-white/10 text-center text-white/50 text-sm" data-testid="footer">
-          <p>VARO™ | Lønnsomhetskalkulator</p>
+          <p>VARO | Lønnsomhetskalkulator</p>
           <p className="mt-1">Beregn lønnsomhet for ditt batteriprosjekt</p>
         </footer>
       </main>
